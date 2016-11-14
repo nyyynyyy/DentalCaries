@@ -33,7 +33,7 @@ public class MoveEnemy : MonoBehaviour {
     {
         float x = transform.position.x;
         float z = transform.position.z;
-        angle = Mathf.Atan(z / x) * Mathf.Rad2Deg + (x > 0 ? 0 : 180f);
+        angle = -(Mathf.Atan(z / x) * Mathf.Rad2Deg + (x > 0 ? 0 : 180f));
     }
 
     private void Move()

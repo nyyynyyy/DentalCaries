@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class EnemyManager : MonoBehaviour {
 
     [Header("Point")]
-    public Transform[] spawnPoint;
     public Transform waitPoint;
 
     [Header("Enemy")]
@@ -28,15 +27,43 @@ public class EnemyManager : MonoBehaviour {
     
     private IEnumerator Round()
     {
-        //CreateEnemy();
-        yield return new WaitForSeconds(1);
+        CreateEnemy();
+        yield return new WaitForSeconds(2);
         StartCoroutine(Round());
     }
 
     public void CreateEnemy()
     {
         Enemy selectedEnemy = enemyList.Find(o => !o.gameObject.active);
-        selectedEnemy.Spawn(spawnPoint[2].position);
+        selectedEnemy.Spawn(GetSpawnPoint());
+    }
+
+    private Vector3 GetSpawnPoint()
+    {
+        Vector3 result;
+        int x=0, y=0;
+
+        switch(Random.Range(0, 4))
+        {
+            case 0: // N
+                x = Random.Range(-24, 24);
+                y = 14;
+                break;
+            case 1: // E
+                x = 14;
+                y = Random.Range(-24, 24);
+                break;
+            case 2: // S
+                x = Random.Range(-24, 24);
+                y = -14;
+                break;
+            case 3: // W
+                x = -14;
+                y = Random.Range(-24, 24);
+                break;         
+        }
+        result = new Vector3(x, 2f, y);
+        return result;
     }
 
     private void SetEnemy()

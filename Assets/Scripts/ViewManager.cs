@@ -55,7 +55,8 @@ public class ViewManager : MonoBehaviour {
 
     private void RotateView(Arrow arrow)
     {
-        if(arrow == Arrow.Left){ _arrow -= _speed; Debug.Log("L"); }
+        if (cam.transform.position == tps.position) return;
+        if (arrow == Arrow.Left){ _arrow -= _speed; Debug.Log("L"); }
         if(arrow == Arrow.Right){ _arrow += _speed; Debug.Log("R"); }
         fps.rotation = Quaternion.Euler(fps.rotation.eulerAngles.x, _arrow, 0);
         cam.transform.rotation = fps.rotation;
