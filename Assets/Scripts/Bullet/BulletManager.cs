@@ -52,15 +52,15 @@ public class BulletManager : MonoBehaviour {
 		_bulletQueue.Enqueue(bulletObject);
 	}
 
-	public static void Shoot(Transform shootLocation) { 
+	public static void Shoot(Vector3 shootLocation, Vector3 targetLocation) { 
 		if (instance._bulletQueue.Count <= 0) { return; }
 
 		GameObject currentBullet = instance._bulletQueue.Dequeue();
 		Bullet bulletScript = currentBullet.GetComponent<Bullet>();
 
-		//currentBullet.transform.SetParent(null);
-		currentBullet.transform.position = shootLocation.position;
-		currentBullet.transform.rotation = shootLocation.rotation;
+		currentBullet.transform.position = shootLocation;
+		currentBullet.transform.LookAt(targetLocation);
+
 		currentBullet.SetActive(true);
 
 		bulletScript.Fire();

@@ -40,4 +40,16 @@ public class Enemy : MonoBehaviour {
         speed = 0;
         Debug.Log("HIT");
     }
+
+	public void Damage() {
+		_health--;
+		if (_health <= 0) {
+			Death();
+		}
+	}
+
+	public void Death() {
+		// health init code here.
+		gameObject.SetActive(false);
+	}
 }

@@ -6,7 +6,7 @@ public class Bullet : MonoBehaviour {
 
 	public float speed = 7F;
 
-	private bool isUsed = false;
+	private bool _isUsed = false;
 
 	public static void SetBulletManager(BulletManager bulletManager)
 	{
@@ -15,24 +15,41 @@ public class Bullet : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other)
 	{
+		EnemyCheck(other);
 		Disable();
-        Debug.Log("ASDASD");
+	}
+
+	private void EnemyCheck(Collider other) {
+		if (other.tag == "Enemy") {
+			Enemy enemy = other.GetComponent<Enemy>();
+			enemy.Damage();
+		}
 	}
 
 	private void Disable() {
-		isUsed = false;
+		_isUsed = false;
+		//_currentTime = 0;
+		StopCoroutine(TimeRemove());
 		bulletManager.SetDisableBullet(this);
 	}
 
 	public void Fire() {
-		isUsed = true;
+		_isUsed = true;
 		StartCoroutine(FireUpdating());
+		StartCoroutine(TimeRemove());
 	}
 
 	private IEnumerator FireUpdating() {
-		while (isUsed) {
+		while (_isUsed) {
+			//_currentTime += Time.deltaTime;
+			//if(_currentTime >= 
 			transform.position = transform.position + transform.forward * Time.deltaTime * speed;
 			yield return null;
 		}
+	}
+
+	private IEnumerator TimeRemove() {
+		yield return new WaitForSeconds(1F);
+		Disable();
 	}
 }
