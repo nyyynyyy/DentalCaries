@@ -3,7 +3,21 @@ using System.Collections;
 
 public class Enemy : MonoBehaviour {
 
-    public float speed = 3f;
+    [Header("State")]
+    [SerializeField] private float _speed = 3f;
+    [SerializeField] private float _health = 3f;
+
+    public float speed
+    {
+        get
+        {
+            return _speed;
+        }
+        set
+        {
+            _speed = Mathf.Max(value, 0);
+        }
+    }
 
     // Use this for initialization
     void Start () {
