@@ -16,6 +16,7 @@ public class Bullet : MonoBehaviour {
 	void OnTriggerEnter(Collider other)
 	{
 		Disable();
+        Debug.Log("ASDASD");
 	}
 
 	private void Disable() {

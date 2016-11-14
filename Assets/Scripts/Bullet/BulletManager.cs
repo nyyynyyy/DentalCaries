@@ -21,25 +21,32 @@ public class BulletManager : MonoBehaviour {
 
 	void Awake()
 	{
-		_bulletsStorage = new GameObject();
-		_bulletsStorage.name = "Bullets";
-		// 총알 20개를 미리 만들어둠
-		for (int i = 0; i < maxBullet; i++) {
-			Bullet bullet = Instantiate(bulletPrefab).GetComponent<Bullet>();
-			SetDisableBullet(bullet);
-		}
+		
 	}
 
 	void Start() {
-		Bullet.SetBulletManager(this);
+        CreateBullet();
 	}
+
+    private void CreateBullet()
+    {
+        _bulletsStorage = new GameObject();
+        _bulletsStorage.name = "Bullets";
+        // 총알 20개를 미리 만들어둠
+        for (int i = 0; i < maxBullet; i++)
+        {
+            Bullet bullet = Instantiate(bulletPrefab).GetComponent<Bullet>();
+            bullet.transform.SetParent(_bulletsStorage.transform);
+            SetDisableBullet(bullet);
+        }
+        Bullet.SetBulletManager(this);
+    }
 
 	// 총알 게임 오브젝트를 비활성화 후 저장
 	public void SetDisableBullet(Bullet bullet) {
 		GameObject bulletObject = bullet.gameObject;
 
 		bulletObject.SetActive(false);
-		bulletObject.transform.SetParent(_bulletsStorage.transform);
 		bulletObject.transform.localPosition = Vector3.zero;
 
 		_bulletQueue.Enqueue(bulletObject);
@@ -51,7 +58,7 @@ public class BulletManager : MonoBehaviour {
 		GameObject currentBullet = instance._bulletQueue.Dequeue();
 		Bullet bulletScript = currentBullet.GetComponent<Bullet>();
 
-		currentBullet.transform.SetParent(null);
+		//currentBullet.transform.SetParent(null);
 		currentBullet.transform.position = shootLocation.position;
 		currentBullet.transform.rotation = shootLocation.rotation;
 		currentBullet.SetActive(true);

@@ -28,7 +28,7 @@ public class EnemyManager : MonoBehaviour {
     
     private IEnumerator Round()
     {
-        CreateEnemy();
+        //CreateEnemy();
         yield return new WaitForSeconds(1);
         StartCoroutine(Round());
     }
