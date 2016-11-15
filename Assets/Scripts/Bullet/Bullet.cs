@@ -49,7 +49,7 @@ public class Bullet : MonoBehaviour {
 	}
 
 	private IEnumerator TimeRemove() {
-		yield return new WaitForSeconds(1F);
+		yield return new WaitForSeconds(3F);
 		Disable();
 	}
 }

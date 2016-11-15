@@ -32,11 +32,13 @@ public class EnemyManager : MonoBehaviour {
         StartCoroutine(Round());
     }
 
+    // @Develope..
     public void CreateEnemy()
     {
         Enemy selectedEnemy = enemyList.Find(o => !o.gameObject.active);
-        selectedEnemy.Spawn(GetSpawnPoint());
+        selectedEnemy.Spawn(GetSpawnPoint(), 1f, 3);
     }
+    // @Develope..
 
     private Vector3 GetSpawnPoint()
     {

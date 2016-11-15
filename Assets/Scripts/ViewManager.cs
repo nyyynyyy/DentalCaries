@@ -3,19 +3,39 @@ using System.Collections;
 
 public class ViewManager : MonoBehaviour {
 
-    public Camera cam;
+    public static ViewManager instance;
 
-    public Transform fps;
-    public Transform tps;
+    public Camera _cam;
+
+    public Transform _fps;
+    public Transform _tps;
 
     public float _speed;
 
     private float _arrow;
 
+    private bool _isTps;
+
     private enum Arrow
     {
         Right,
         Left,
+    }
+
+    public bool isTps {
+        get
+        {
+            return _isTps;
+        }
+    }
+
+    void Awake()
+    {
+        if (instance)
+        {
+            Debug.LogError("Multi Instance Running.. : ViewManager");
+        }
+        instance = this;
     }
 
     void Start () {
@@ -29,7 +49,7 @@ public class ViewManager : MonoBehaviour {
     private void Init()
     {
         ChangeViewFps();
-        _arrow = fps.rotation.eulerAngles.y;
+        _arrow = _fps.rotation.eulerAngles.y;
         Debug.Log(_arrow);
     }
 
@@ -55,24 +75,26 @@ public class ViewManager : MonoBehaviour {
 
     private void RotateView(Arrow arrow)
     {
-        if (cam.transform.position == tps.position) return;
-        if (arrow == Arrow.Left){ _arrow -= _speed; Debug.Log("L"); }
-        if(arrow == Arrow.Right){ _arrow += _speed; Debug.Log("R"); }
-        fps.rotation = Quaternion.Euler(fps.rotation.eulerAngles.x, _arrow, 0);
-        cam.transform.rotation = fps.rotation;
+        if (_isTps) return;
+        if (arrow == Arrow.Left) _arrow -= _speed; 
+        if(arrow == Arrow.Right) _arrow += _speed;
+        _fps.rotation = Quaternion.Euler(_fps.rotation.eulerAngles.x, _arrow, 0);
+        _cam.transform.rotation = _fps.rotation;
     }
 
     private void ChangeViewFps()
     {
-        if (cam.transform.position == fps.position) return; 
-        cam.transform.position = fps.position;
-        cam.transform.rotation = fps.rotation;
+        if (!_isTps) return; 
+        _cam.transform.position = _fps.position;
+        _cam.transform.rotation = _fps.rotation;
+        _isTps = false;
     }
 
     private void ChangeViewTps()
     {
-        if (cam.transform.position == tps.position) return;
-        cam.transform.position = tps.position;
-        cam.transform.rotation = tps.rotation;
+        if (_isTps) return;
+        _cam.transform.position = _tps.position;
+        _cam.transform.rotation = _tps.rotation;
+        _isTps = true;
     }
 }

@@ -4,40 +4,28 @@ using System.Collections;
 public class Enemy : MonoBehaviour {
 
     [Header("State")]
-    [SerializeField] private float _speed = 3f;
-    [SerializeField] private float _health = 3f;
+    public float _speed = 3f;
+    public float _health = 3f;
 
-    public float speed
+    private MoveEnemy _move;
+
+    void Awake()
     {
-        get
-        {
-            return _speed;
-        }
-        set
-        {
-            _speed = Mathf.Max(value, 0);
-        }
+        _move = GetComponent<MoveEnemy>();
     }
 
-    // Use this for initialization
-    void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-
-    public void Spawn(Vector3 spawnPoint)
+    public void Spawn(Vector3 spawnPoint, float speed, float health)
     {
         transform.position = spawnPoint;
+        _move.SetMyAnlge();
+        _health = health;
+        _speed = speed;
         gameObject.SetActive(true);
     }
 
     public void HitHeart()
     {
-        speed = 0;
+        _speed = 0;
         Debug.Log("HIT");
     }
 

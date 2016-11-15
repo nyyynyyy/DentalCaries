@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 public class BulletManager : MonoBehaviour {
 	private static BulletManager instance;
@@ -9,26 +10,47 @@ public class BulletManager : MonoBehaviour {
 			Debug.LogError("Already existing instance BulletManager.");
 			return;
 		}
-
 		instance = this;
 	}
 
 	public GameObject bulletPrefab;
 	public int maxBullet = 20;
 
-	private Queue<GameObject> _bulletQueue = new Queue<GameObject>();
+    public Camera mainCamera;
+    public Transform shootLocation;
+    public float shootDelay = 0.5F;
+
+    private Queue<GameObject> _bulletQueue = new Queue<GameObject>();
 	private GameObject _bulletsStorage;
 
-	void Awake()
+    private WaitForSeconds waitForShootDelay;
+
+    void Awake()
 	{
 		
 	}
 
 	void Start() {
-        CreateBullet();
-	}
+        SetBullet();
+        StartCoroutine(Shoot());
+    }
 
-    private void CreateBullet()
+    private IEnumerator Shoot()
+    {
+        waitForShootDelay = new WaitForSeconds(shootDelay);
+        while (true)
+        {
+            if (Input.GetMouseButton(0) && !ViewManager.instance.isTps)
+            {
+                Vector3 targetPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
+                BulletManager.Shoot(shootLocation.transform.position, targetPosition);
+                yield return waitForShootDelay;
+            }
+            yield return null;
+        }
+    }
+
+    private void SetBullet()
     {
         _bulletsStorage = new GameObject();
         _bulletsStorage.name = "Bullets";

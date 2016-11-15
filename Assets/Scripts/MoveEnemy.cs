@@ -29,7 +29,7 @@ public class MoveEnemy : MonoBehaviour {
         }
     }
 
-    private void SetMyAnlge()
+    public void SetMyAnlge()
     {
         float x = transform.position.x;
         float z = transform.position.z;
@@ -40,7 +40,7 @@ public class MoveEnemy : MonoBehaviour {
     {
         Vector3 movePosition;
         transform.rotation = Quaternion.Euler(0, angle, 0);
-        movePosition = transform.position + transform.right * -_enemy.speed * Time.deltaTime;
+        movePosition = transform.position + transform.right * -_enemy._speed * Time.deltaTime;
         transform.position = movePosition;
     }
 }
