@@ -40,7 +40,7 @@ public class BulletManager : MonoBehaviour {
         waitForShootDelay = new WaitForSeconds(shootDelay);
         while (true)
         {
-            if (Input.GetMouseButton(0) && !ViewManager.instance.isTps)
+			if (Input.GetMouseButtonDown(0) && !ViewManager.instance.isTps)
             {
                 Vector3 targetPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
                 BulletManager.Shoot(shootLocation.transform.position, targetPosition);
