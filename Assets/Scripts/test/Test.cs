@@ -1,8 +1,30 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Test : MonoBehaviour {
-	public GameObject testPrefab;
+	private static Test instance;
+
+	[Header("Goal Target")]
+	public Transform goalTarget;
+
+	[Header("Spawnpoint GameObject")]
+	public GameObject spawnPointPrefab;
+
+	private Dictionary<Enemy, GameObject> _usingSpawnPoints;
+	private List<GameObject> _spawnPoints;
+
+	private Test() {
+		if (instance) {
+			Debug.LogError("Already loaded instance: Test.cs");
+
+		}
+
+		instance = this;
+		_usingSpawnPoints = new Dictionary<Enemy, GameObject>();
+		_spawnPoints = new List<GameObject>();
+
+	}
 
 	// Use this for initialization
 	void Start () {
@@ -12,22 +34,26 @@ public class Test : MonoBehaviour {
 		for (int i = 0; i <= 4; i++) {
 			movePos = 0.35F - (0.175F * i);
 
-			SpawnObject(fixingPos, y, movePos);
-			SpawnObject(-fixingPos, y, movePos);
+			CreatePoint(fixingPos, y, movePos);
+			CreatePoint(-fixingPos, y, movePos);
 
-			SpawnObject(movePos, y, fixingPos);
-			SpawnObject(movePos, y, -fixingPos);
+			CreatePoint(movePos, y, fixingPos);
+			CreatePoint(movePos, y, -fixingPos);
 		}
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 
-	void SpawnObject(float x, float y, float z) {
-		GameObject testObject = Instantiate(testPrefab);
+	private void CreatePoint(float x, float y, float z) {
+		GameObject testObject = Instantiate(spawnPointPrefab);
+
 		testObject.transform.SetParent(transform);
 		testObject.transform.localPosition = new Vector3(x, y, z);
+	}
+
+	public static bool SpawnEnemy(Enemy enemy) {
+		if(instance._spawnPoints.Count <= 0)
+			return false;
+
+
+		return true;
 	}
 }

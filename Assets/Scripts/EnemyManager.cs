@@ -3,20 +3,35 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class EnemyManager : MonoBehaviour {
+	private static EnemyManager instance;
 
     [Header("Point")]
     public Transform waitPoint;
 
     [Header("Enemy")]
     public GameObject[] enemyUnit;
-
     public int maxEnemy = 15;
+
+	[Header("SpawnPoint")]
+	public Transform playingPlace;
 
     private List<Enemy> enemyList = new List<Enemy>();
 
+	// spawnPoint
+	private List<Transform> _spawnPoints;
+
 	// Use this for initialization
 	void Start () {
+		if (instance) {
+			Debug.LogError("Already loaded instance: Test.cs");
+			return;
+		}
+
+		instance = this;
+		_spawnPoints = new List<Transform>();
+
         SetEnemy();
+		SetSpawnPoints();
         StartCoroutine(Round());
     }
 	
@@ -28,15 +43,22 @@ public class EnemyManager : MonoBehaviour {
     private IEnumerator Round()
     {
         CreateEnemy();
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(0.2F);
         StartCoroutine(Round());
     }
 
     // @Develope..
     public void CreateEnemy()
     {
-        Enemy selectedEnemy = enemyList.Find(o => !o.gameObject.active);
-        selectedEnemy.Spawn(GetSpawnPoint(), 1f, 3);
+        Enemy selectedEnemy = enemyList.Find(o => !o.gameObject.activeSelf);
+		if (selectedEnemy && CanSpawnEnemy())
+			
+		{
+			selectedEnemy.Spawn(UseSpawnPoint(selectedEnemy).position, 1f, 3);
+		}
+		else {
+			Debug.Log("asdf");
+		}
     }
     // @Develope..
 
@@ -81,4 +103,56 @@ public class EnemyManager : MonoBehaviour {
             temp.SetActive(false);
         }
     }
+
+	/**** Spawn Point ****/
+	private bool CanSpawnEnemy() {
+		return _spawnPoints.Count > 0;
+	}
+
+	private Transform UseSpawnPoint(Enemy enemy) {
+		if (!CanSpawnEnemy()) {
+			return null;
+		}
+
+		System.Random random = new System.Random();
+
+		int index = random.Next(_spawnPoints.Count);
+		Transform spawnPoint = _spawnPoints[index];
+		_spawnPoints.Remove(spawnPoint);
+
+		StartCoroutine(FreeSpawnPoint(spawnPoint));
+		return spawnPoint;
+	}
+
+	private IEnumerator FreeSpawnPoint(Transform spawnPoint) {
+		yield return new WaitForSeconds(3);
+		_spawnPoints.Add(spawnPoint);
+	}
+
+	private void SetSpawnPoints() { 
+		float movePos;
+		float fixingPos = 0.45F;
+		float y = 0.7F;
+		for (int i = 0; i <= 4; i++) {
+			movePos = 0.35F - (0.175F * i);
+
+			CreateSpawnPoint(fixingPos, y, movePos);
+			CreateSpawnPoint(-fixingPos, y, movePos);
+
+			CreateSpawnPoint(movePos, y, fixingPos);
+			CreateSpawnPoint(movePos, y, -fixingPos);
+		}
+	}
+
+	private void CreateSpawnPoint(float x, float y, float z)
+	{
+		GameObject testObject = new GameObject();
+
+		testObject.name = "SpawnPoint";
+		testObject.transform.SetParent(playingPlace);
+		testObject.transform.localPosition = new Vector3(x, y, z);
+
+		_spawnPoints.Add(testObject.transform);
+	}
+	/********************/
 }
