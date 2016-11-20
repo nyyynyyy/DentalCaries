@@ -25,7 +25,8 @@ public class MoveEnemy : MonoBehaviour {
     {
         if (other.tag == "Heart")
         {
-            _enemy.HitHeart();
+            Debug.Log("HIT HEART");
+            StartCoroutine(_enemy.HitHeart());
         }
     }
 
@@ -40,7 +41,7 @@ public class MoveEnemy : MonoBehaviour {
     {
         Vector3 movePosition;
         transform.rotation = Quaternion.Euler(0, angle, 0);
-        movePosition = transform.position + transform.right * -_enemy._speed * Time.deltaTime;
+        movePosition = transform.position + transform.right * -_enemy._moveSpeed * Time.deltaTime;
         transform.position = movePosition;
     }
 }

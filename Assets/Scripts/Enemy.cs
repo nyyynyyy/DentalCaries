@@ -4,7 +4,9 @@ using System.Collections;
 public class Enemy : MonoBehaviour {
 
     [Header("State")]
-    public float _speed = 3f;
+    public float _moveSpeed = 3f;
+    public float _attackSpeed = 1f;
+    public float _attackPower = 2f;
     public float _health = 3f;
 
     private MoveEnemy _move;
@@ -19,14 +21,19 @@ public class Enemy : MonoBehaviour {
         transform.position = spawnPoint;
         _move.SetMyAnlge();
         _health = health;
-        _speed = speed;
+        _moveSpeed = speed;
         gameObject.SetActive(true);
     }
 
-    public void HitHeart()
+    public IEnumerator HitHeart()
     {
-        _speed = 0;
-        Debug.Log("HIT");
+        _moveSpeed = 0;
+        while(!GameManager.instance.IsGame()){
+            GameManager.instance.Damage(_attackPower);
+            yield return new WaitForSeconds(_attackSpeed);
+            Debug.Log("DAMAGE");
+        }
+        
     }
 
 	public void Damage() {

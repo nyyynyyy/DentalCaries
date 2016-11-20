@@ -6,6 +6,7 @@ public class ViewManager : MonoBehaviour {
     public static ViewManager instance;
 
     public Camera _cam;
+    public GameObject _hand;
 
     public Transform _fps;
     public Transform _tps;
@@ -50,7 +51,6 @@ public class ViewManager : MonoBehaviour {
     {
         ChangeViewFps();
         _arrow = _fps.rotation.eulerAngles.y;
-        Debug.Log(_arrow);
     }
 
     private void ReadyKey()
@@ -75,11 +75,18 @@ public class ViewManager : MonoBehaviour {
 
     private void RotateView(Arrow arrow)
     {
-        if (_isTps) return;
-        if (arrow == Arrow.Left) _arrow -= _speed; 
-        if(arrow == Arrow.Right) _arrow += _speed;
+        if (arrow == Arrow.Left) _arrow -= _speed;
+        if (arrow == Arrow.Right) _arrow += _speed;
         _fps.rotation = Quaternion.Euler(_fps.rotation.eulerAngles.x, _arrow, 0);
-        _cam.transform.rotation = _fps.rotation;
+
+        if (_isTps)
+        {
+            _hand.transform.rotation = Quaternion.Euler(0, _arrow, 0);
+        }
+        else
+        { 
+            _cam.transform.rotation = _fps.rotation;
+        }
     }
 
     private void ChangeViewFps()
@@ -87,6 +94,7 @@ public class ViewManager : MonoBehaviour {
         if (!_isTps) return; 
         _cam.transform.position = _fps.position;
         _cam.transform.rotation = _fps.rotation;
+        _hand.SetActive(false);
         _isTps = false;
     }
 
@@ -95,6 +103,8 @@ public class ViewManager : MonoBehaviour {
         if (_isTps) return;
         _cam.transform.position = _tps.position;
         _cam.transform.rotation = _tps.rotation;
+        _hand.SetActive(true);
+        _hand.transform.rotation = Quaternion.Euler(0,_arrow,0);
         _isTps = true;
     }
 }

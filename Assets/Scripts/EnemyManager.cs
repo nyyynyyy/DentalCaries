@@ -36,7 +36,7 @@ public class EnemyManager : MonoBehaviour {
     public void CreateEnemy()
     {
         Enemy selectedEnemy = enemyList.Find(o => !o.gameObject.active);
-        selectedEnemy.Spawn(GetSpawnPoint(), 1f, 3);
+        selectedEnemy.Spawn(GetSpawnPoint(), 2f, 3);
     }
     // @Develope..
 
