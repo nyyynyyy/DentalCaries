@@ -51,7 +51,7 @@ public class EnemyManager : MonoBehaviour {
     public void CreateEnemy()
     {
         Enemy selectedEnemy = enemyList.Find(o => !o.gameObject.active);
-        selectedEnemy.Spawn(GetSpawnPoint(), 2f, 3);
+        //selectedEnemy.Spawn(GetSpawnPoint(), 2f, 3);
 		if (selectedEnemy && CanSpawnEnemy())
 			
 		{
@@ -60,35 +60,6 @@ public class EnemyManager : MonoBehaviour {
 		else {
 			Debug.Log("asdf");
 		}
-    }
-    // @Develope..
-
-    private Vector3 GetSpawnPoint()
-    {
-        Vector3 result;
-        int x=0, y=0;
-
-        switch(Random.Range(0, 4))
-        {
-            case 0: // N
-                x = Random.Range(-24, 24);
-                y = 14;
-                break;
-            case 1: // E
-                x = 14;
-                y = Random.Range(-24, 24);
-                break;
-            case 2: // S
-                x = Random.Range(-24, 24);
-                y = -14;
-                break;
-            case 3: // W
-                x = -14;
-                y = Random.Range(-24, 24);
-                break;         
-        }
-        result = new Vector3(x, 2f, y);
-        return result;
     }
 
     private void SetEnemy()
@@ -156,4 +127,35 @@ public class EnemyManager : MonoBehaviour {
 		_spawnPoints.Add(testObject.transform);
 	}
 	/********************/
+
+	/** Junk Source **/
+
+	// @Develope..
+	//private Vector3 GetSpawnPoint()
+	//{
+	//    Vector3 result;
+	//    int x=0, y=0;
+
+	//    switch(Random.Range(0, 4))
+	//    {
+	//        case 0: // N
+	//            x = Random.Range(-24, 24);
+	//            y = 14;
+	//            break;
+	//        case 1: // E
+	//            x = 14;
+	//            y = Random.Range(-24, 24);
+	//            break;
+	//        case 2: // S
+	//            x = Random.Range(-24, 24);
+	//            y = -14;
+	//            break;
+	//        case 3: // W
+	//            x = -14;
+	//            y = Random.Range(-24, 24);
+	//            break;         
+	//    }
+	//    result = new Vector3(x, 2f, y);
+	//    return result;
+	//}
 }
