@@ -7,10 +7,11 @@ public class WeaponManager : MonoBehaviour {
 
 	[Header("Weapon")]
 	public Weapon mainWeapon;
-
-	[Header("Option")]
 	public int maxAmount;
 	public float deleteDelay;
+
+	[Header("Fire")]
+	public float fireDelay;
 	public Transform fireLocation;
 
 	private WaitForSeconds _waitForFireDelay;
@@ -24,7 +25,7 @@ public class WeaponManager : MonoBehaviour {
 
 		instance = this;
 
-		_waitForFireDelay = new WaitForSeconds(mainWeapon.fireDelay);
+		_waitForFireDelay = new WaitForSeconds(fireDelay);
 		_weaponDeleteDelay = new WaitForSeconds(deleteDelay);
 		_readyWeapons = new Queue<Weapon>();
 

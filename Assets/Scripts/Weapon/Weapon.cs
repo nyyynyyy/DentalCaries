@@ -2,9 +2,6 @@
 using System.Collections;
 
 public abstract class Weapon : MonoBehaviour {
-	
-	[Header("Option")]
-	public float fireDelay; 
 
 	void OnTriggerEnter(Collider other)
 	{
