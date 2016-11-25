@@ -15,7 +15,7 @@ public class HomingMissile : Weapon {
 	}
 
 	public override void HitEnemy(Enemy enemy) {
-		enemy.Damage();
+		enemy.Damage(1);
 		Delete();
 	}
 

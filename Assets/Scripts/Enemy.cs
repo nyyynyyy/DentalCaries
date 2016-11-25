@@ -14,20 +14,23 @@ public class Enemy : MonoBehaviour {
 	public float _particleDuation = 2F;
 
     private MoveEnemy _move;
+	private Rigidbody _rigidbody;
 
     void Awake()
     {
         _move = GetComponent<MoveEnemy>();
 		_deathParticle = Instantiate(_deathParticle).GetComponent<ParticleSystem>();
 		_deathParticle.transform.SetParent(transform);
+		_rigidbody = GetComponent<Rigidbody>();
     }
 
-    public void Spawn(Vector3 spawnPoint, float speed, float health)
+    public void Spawn(Vector3 spawnPoint, Transform targetPoint,float speed, float health)
     {
-		_move.SetMyAnlge();
 		transform.position = spawnPoint;
+		_move.SetTarget(targetPoint);
         _health = health;
         _moveSpeed = speed;
+		_rigidbody.constraints = RigidbodyConstraints.None;
 
 		StopCoroutine(ComeBackHomeMyParticle());
 		_deathParticle.transform.localPosition = Vector3.zero;
@@ -40,14 +43,15 @@ public class Enemy : MonoBehaviour {
         _moveSpeed = 0;
         while(!GameManager.instance.IsGame()){
             GameManager.instance.Damage(_attackPower);
+			_rigidbody.constraints = RigidbodyConstraints.FreezePositionY;
             yield return new WaitForSeconds(_attackSpeed);
             Debug.Log("DAMAGE");
         }
         
     }
 
-	public void Damage() {
-		_health--;
+	public void Damage(int amount) {
+		_health -= amount;
 		if (_health <= 0) {
 			Death();
 		}

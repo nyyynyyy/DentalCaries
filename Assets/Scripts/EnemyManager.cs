@@ -7,6 +7,7 @@ public class EnemyManager : MonoBehaviour {
 
     [Header("Point")]
     public Transform waitPoint;
+	public Transform heartPoint;
 
     [Header("Enemy")]
     public GameObject[] enemyUnit;
@@ -53,7 +54,7 @@ public class EnemyManager : MonoBehaviour {
         Enemy selectedEnemy = enemyList.Find(o => !o.gameObject.active);
 		if (selectedEnemy && CanSpawnEnemy())
 		{
-			selectedEnemy.Spawn(UseSpawnPoint(selectedEnemy).position, 1f, 3);
+			selectedEnemy.Spawn(UseSpawnPoint(selectedEnemy).position, heartPoint, 1f, 3);
 		}
     }
     // @Develope..

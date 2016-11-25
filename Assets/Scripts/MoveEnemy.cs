@@ -4,7 +4,7 @@ using System.Collections;
 public class MoveEnemy : MonoBehaviour {
 
     private Enemy _enemy;
-    private float angle;
+    private Transform _target;
 
     void Awake()
     {
@@ -13,7 +13,7 @@ public class MoveEnemy : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        SetMyAnlge();
+        //SetMyAnlge();
     }
 
     // Update is called once per frame
@@ -30,18 +30,20 @@ public class MoveEnemy : MonoBehaviour {
         }
     }
 
-    public void SetMyAnlge()
+    public void SetTarget(Transform target)
     {
-        float x = transform.position.x;
-        float z = transform.position.z;
-        angle = -(Mathf.Atan(z / x) * Mathf.Rad2Deg + (x > 0 ? 0 : 180f));
+		_target = target;
     }
 
     private void Move()
     {
         Vector3 movePosition;
-        transform.rotation = Quaternion.Euler(0, angle, 0);
-        movePosition = transform.position + transform.right * -_enemy._moveSpeed * Time.deltaTime;
-        transform.position = movePosition;
+		float angle;
+
+		movePosition = transform.position + transform.forward * -_enemy._moveSpeed * Time.deltaTime;
+		angle = Quaternion.LookRotation(transform.position - _target.position).eulerAngles.y;
+
+		transform.position = movePosition;
+		transform.rotation = Quaternion.AngleAxis(angle, Vector3.up);
     }
 }
