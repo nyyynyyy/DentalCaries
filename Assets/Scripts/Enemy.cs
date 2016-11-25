@@ -24,8 +24,8 @@ public class Enemy : MonoBehaviour {
 
     public void Spawn(Vector3 spawnPoint, float speed, float health)
     {
-        transform.position = spawnPoint;
-        _move.SetMyAnlge();
+		_move.SetMyAnlge();
+		transform.position = spawnPoint;
         _health = health;
         _moveSpeed = speed;
 

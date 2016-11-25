@@ -55,9 +55,6 @@ public class EnemyManager : MonoBehaviour {
 		{
 			selectedEnemy.Spawn(UseSpawnPoint(selectedEnemy).position, 1f, 3);
 		}
-		else {
-			Debug.Log("asdf");
-		}
     }
     // @Develope..
 

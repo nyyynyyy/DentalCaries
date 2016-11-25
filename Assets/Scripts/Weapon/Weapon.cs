@@ -2,17 +2,27 @@
 using System.Collections;
 
 public abstract class Weapon : MonoBehaviour {
+	
+	[Header("Option")]
+	public float fireDelay; 
 
-	// Use this for initialization
-	void Start () {
-	
+	void OnTriggerEnter(Collider other)
+	{
+		EnemyCheck(other);
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+
+	private void EnemyCheck(Collider other)
+	{
+		if (other.tag == "Enemy")
+		{
+			Enemy enemy = other.GetComponent<Enemy>();
+			HitEnemy(enemy);
+		}
 	}
+
+	public abstract void Delete();
 
 	public abstract void Fire();
 
+	public abstract void HitEnemy(Enemy enemy);
 }
