@@ -16,13 +16,12 @@ public class HomingMissile : Weapon {
 
 	public override void HitEnemy(Enemy enemy) {
 		enemy.Damage();
-
 		Delete();
-		gameObject.SetActive(false);
 	}
 
 	public override void Delete() {
 		StopAllCoroutines();
+		gameObject.SetActive(false);
 	}
 
 	IEnumerator Move() {
