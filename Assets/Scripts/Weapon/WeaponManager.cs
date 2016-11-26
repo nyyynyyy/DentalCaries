@@ -59,9 +59,8 @@ public class WeaponManager : MonoBehaviour {
 		RaycastHit rayHit;
 		Vector3 targetPos;
 
-		if (Physics.Raycast(ray, out rayHit, 30f)) {
+		if (Physics.Raycast(ray, out rayHit, 30f) && rayHit.transform.tag == "Enemy") {
 			targetPos = rayHit.transform.position;
-
 			if (rayHit.collider is BoxCollider) {
 				targetPos += ((BoxCollider)rayHit.collider).center;
 			}
