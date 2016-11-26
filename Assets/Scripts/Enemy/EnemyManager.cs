@@ -69,6 +69,10 @@ public class EnemyManager : MonoBehaviour {
 		if (selectedEnemy && CanSpawnEnemy())
 		{
 			selectedEnemy.Spawn(UseSpawnPoint(selectedEnemy).position, heartPoint, 1f);
+			//side random move
+			System.Random random = new System.Random();
+			Vector3 randomPos = selectedEnemy.transform.position + (Vector3.right * random.Next(4));
+			selectedEnemy.transform.position = randomPos;
 		}
     }
 
