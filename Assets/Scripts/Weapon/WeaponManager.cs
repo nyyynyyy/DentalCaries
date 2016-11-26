@@ -5,6 +5,9 @@ using System.Collections.Generic;
 public class WeaponManager : MonoBehaviour {
 	private static WeaponManager instance;
 
+	[Header("Weapon Model")]
+	public WeaponModelRotate weaponModel;
+
 	[Header("Weapon")]
 	public Weapon mainWeapon;
 	public int maxAmount;
@@ -52,12 +55,29 @@ public class WeaponManager : MonoBehaviour {
 			return false;
 		}
 
-		Vector3 targetPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
+		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+		RaycastHit rayHit;
+		Vector3 targetPos;
+
+		if (Physics.Raycast(ray, out rayHit, 30f) && rayHit.transform.tag == "Enemy") {
+			targetPos = rayHit.transform.position;
+			if (rayHit.collider is BoxCollider) {
+				targetPos += ((BoxCollider)rayHit.collider).center;
+			}
+		}
+		else {
+			targetPos = weaponModel.transform.position + ray.GetPoint(15);
+		}
+
+		weaponModel.SetAngleTarget(targetPos);
+
+
+		//Vector3 targetPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
 
 		Weapon fireWeapon = _readyWeapons.Dequeue();
 
 		fireWeapon.transform.position = fireLocation.position;
-		fireWeapon.transform.LookAt(targetPosition);
+		fireWeapon.transform.LookAt(targetPos);
 		fireWeapon.gameObject.SetActive(true);
 		fireWeapon.Fire();
 
