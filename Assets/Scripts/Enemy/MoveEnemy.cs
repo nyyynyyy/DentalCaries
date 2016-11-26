@@ -40,7 +40,7 @@ public class MoveEnemy : MonoBehaviour {
         Vector3 movePosition;
 		float angle;
 
-		movePosition = transform.position + transform.forward * -_enemy._moveSpeed * Time.deltaTime;
+		movePosition = transform.position + transform.forward * -_enemy.moveSpeed * Time.deltaTime;
 		angle = Quaternion.LookRotation(transform.position - _target.position).eulerAngles.y;
 
 		transform.position = movePosition;

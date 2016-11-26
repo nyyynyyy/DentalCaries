@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class EnemyManager : MonoBehaviour {
-	private static EnemyManager instance;
+	public static EnemyManager instance;
 
     [Header("Point")]
     public Transform waitPoint;
@@ -13,10 +13,15 @@ public class EnemyManager : MonoBehaviour {
     public GameObject[] enemyUnit;
     public int maxEnemy = 15;
 
+	[Header("Death Particle")]
+	public ParticleSystem deathParticle;
+	public float deathParticleDeleteDelay;
+
 	[Header("SpawnPoint")]
 	public Transform playingPlace;
 
-    private List<Enemy> enemyList = new List<Enemy>();
+    private List<Enemy> _enemyList = new List<Enemy>();
+	private List<ParticleSystem> _deathParticlList = new List<ParticleSystem>();
 
 	// spawnPoint
 	private List<Transform> _spawnPoints;
@@ -24,7 +29,7 @@ public class EnemyManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		if (instance) {
-			Debug.LogError("Already loaded instance: Test.cs");
+			Debug.LogError("Already loaded instance: EnemyManager.cs");
 			return;
 		}
 
@@ -35,10 +40,13 @@ public class EnemyManager : MonoBehaviour {
 		SetSpawnPoints();
         StartCoroutine(Round());
     }
-	
-	// Update is called once per frame
-	void Update () {
-	
+
+	public void CreateDeathParticle(Transform transform) {
+		ParticleSystem particle = _deathParticlList.Find(o => o.gameObject.activeInHierarchy);
+		particle.transform.position = transform.position;
+		particle.Play();
+
+
 	}
     
     private IEnumerator Round()
@@ -48,56 +56,37 @@ public class EnemyManager : MonoBehaviour {
         StartCoroutine(Round());
     }
 
-    // @Develope..
-    public void CreateEnemy()
+    private void CreateEnemy()
     {
-		Enemy selectedEnemy = enemyList.Find(o => !o.gameObject.activeInHierarchy);
+		Enemy selectedEnemy = _enemyList.Find(o => !o.gameObject.activeInHierarchy);
 		if (selectedEnemy && CanSpawnEnemy())
 		{
-			selectedEnemy.Spawn(UseSpawnPoint(selectedEnemy).position, heartPoint, 1f, 3);
+			selectedEnemy.Spawn(UseSpawnPoint(selectedEnemy).position, heartPoint, 1f);
 		}
-    }
-    // @Develope..
-
-    private Vector3 GetSpawnPoint()
-    {
-        Vector3 result;
-        int x=0, y=0;
-
-        switch(Random.Range(0, 4))
-        {
-            case 0: // N
-                x = Random.Range(-24, 24);
-                y = 14;
-                break;
-            case 1: // E
-                x = 14;
-                y = Random.Range(-24, 24);
-                break;
-            case 2: // S
-                x = Random.Range(-24, 24);
-                y = -14;
-                break;
-            case 3: // W
-                x = -14;
-                y = Random.Range(-24, 24);
-                break;         
-        }
-        result = new Vector3(x, 2f, y);
-        return result;
     }
 
     private void SetEnemy()
     {
-        GameObject tempParent = new GameObject();
-        tempParent.name = "Enemys";
+        GameObject tempParent = new GameObject("Enemys");
+		GameObject tempParticleParent = new GameObject("DeathParticles");
+		tempParticleParent.transform.parent = tempParent.transform;
+
         for (int i = 0; i < maxEnemy; i++)
         {
             GameObject temp = (GameObject)Instantiate(enemyUnit[0], waitPoint.position, Quaternion.identity);
-            temp.name = "Enemy" + i;
+            GameObject tempParticle = (GameObject)Instantiate(deathParticle.gameObject);
+
+			temp.name = "Enemy" + i;
+			tempParticle.name = "DeathParticle" + i;
+
             temp.transform.parent = tempParent.transform;
-            enemyList.Add(temp.GetComponent<Enemy>());
+			tempParticle.transform.parent = tempParticleParent.transform;
+
+            _enemyList.Add(temp.GetComponent<Enemy>());
+			_deathParticlList.Add(tempParticle.GetComponent<ParticleSystem>());
+
             temp.SetActive(false);
+			tempParticle.SetActive(false);
         }
     }
 
@@ -152,4 +141,34 @@ public class EnemyManager : MonoBehaviour {
 		_spawnPoints.Add(testObject.transform);
 	}
 	/********************/
+
+
+	//Junk Source
+	//private Vector3 GetSpawnPoint()
+	//{
+	//	Vector3 result;
+	//	int x = 0, y = 0;
+
+	//	switch (Random.Range(0, 4))
+	//	{
+	//		case 0: // N
+	//			x = Random.Range(-24, 24);
+	//			y = 14;
+	//			break;
+	//		case 1: // E
+	//			x = 14;
+	//			y = Random.Range(-24, 24);
+	//			break;
+	//		case 2: // S
+	//			x = Random.Range(-24, 24);
+	//			y = -14;
+	//			break;
+	//		case 3: // W
+	//			x = -14;
+	//			y = Random.Range(-24, 24);
+	//			break;
+	//	}
+	//	result = new Vector3(x, 2f, y);
+	//	return result;
+	//}
 }

@@ -3,11 +3,13 @@ using System.Collections;
 
 public class Enemy : MonoBehaviour {
 
+	public string name;
+
     [Header("State")]
-    public float _moveSpeed = 3f;
-    public float _attackSpeed = 1f;
-    public float _attackPower = 2f;
-    public float _health = 3f;
+    public float moveSpeed = 3f;
+    public float attackSpeed = 1f;
+	public float attackPower = 2f;
+	public float maxHp = 3F;
 
 	[Header("Death Particle")]
 	public ParticleSystem _deathParticle;
@@ -15,6 +17,8 @@ public class Enemy : MonoBehaviour {
 
     private MoveEnemy _move;
 	private Rigidbody _rigidbody;
+
+	private float _nowHp;
 
     void Awake()
     {
@@ -24,37 +28,43 @@ public class Enemy : MonoBehaviour {
 		_rigidbody = GetComponent<Rigidbody>();
     }
 
-    public void Spawn(Vector3 spawnPoint, Transform targetPoint,float speed, float health)
+    public void Spawn(Vector3 spawnPoint, Transform targetPoint,float speed)
     {
 		transform.position = spawnPoint;
 		_move.SetTarget(targetPoint);
-        _health = health;
-        _moveSpeed = speed;
+		_nowHp = maxHp;
+        moveSpeed = speed;
 		_rigidbody.constraints = RigidbodyConstraints.None;
 
 		StopCoroutine(ComeBackHomeMyParticle());
 		_deathParticle.transform.localPosition = Vector3.zero;
+		_deathParticle.transform.localScale = Vector3.one;
+		_deathParticle.transform.rotation = Quaternion.Euler(0, 0, 0);
 
         gameObject.SetActive(true);
     }
 
     public IEnumerator HitHeart()
     {
-        _moveSpeed = 0;
+        moveSpeed = 0;
+		_rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+		moveSpeed = 0;
         while(!GameManager.instance.IsGame()){
-            GameManager.instance.Damage(_attackPower);
-			_rigidbody.constraints = RigidbodyConstraints.FreezePositionY;
-            yield return new WaitForSeconds(_attackSpeed);
+            GameManager.instance.Damage(attackPower);
+            yield return new WaitForSeconds(attackSpeed);
             Debug.Log("DAMAGE");
         }
         
     }
 
 	public void Damage(int amount) {
-		_health -= amount;
-		if (_health <= 0) {
+		_nowHp -= amount;
+		if (_nowHp <= 0) {
+			_nowHp = 0;
 			Death();
 		}
+		Debug.Log("asdf");
+		HealthBar.instance.ViewUi(maxHp, _nowHp, name);
 	}
 
 	public void Death() {
@@ -63,6 +73,7 @@ public class Enemy : MonoBehaviour {
 		_deathParticle.Play();
 
 		transform.localScale = Vector3.zero;
+		_rigidbody.velocity = Vector3.zero;
 
 		StartCoroutine(ComeBackHomeMyParticle());
 		//Destroy(_deathParticle.gameObject, _particleDuration);
