@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class ViewManager : MonoBehaviour {
@@ -15,7 +16,7 @@ public class ViewManager : MonoBehaviour {
 
     private float _arrow;
 
-    private bool _isTps;
+    private bool _isTps = true;
 
     private enum Arrow
     {
@@ -49,8 +50,8 @@ public class ViewManager : MonoBehaviour {
 
     private void Init()
     {
-        ChangeViewFps();
         _arrow = _fps.rotation.eulerAngles.y;
+        ChangeViewFps();
     }
 
     private void ReadyKey()
@@ -58,6 +59,7 @@ public class ViewManager : MonoBehaviour {
         if (Input.GetKey(KeyCode.Space))
         {
             ChangeViewTps();
+            ChangeHandAngle();
         }
         if (Input.GetKeyUp(KeyCode.Space))
         {
@@ -81,12 +83,17 @@ public class ViewManager : MonoBehaviour {
 
         if (_isTps)
         {
-            _hand.transform.rotation = Quaternion.Euler(0, _arrow, 0);
+            ChangeHandAngle();
         }
         else
         { 
             _cam.transform.rotation = _fps.rotation;
         }
+    }
+
+    private void ChangeHandAngle()
+    {
+        _hand.GetComponent<RectTransform>().rotation = Quaternion.Euler(0, 0, -_arrow);
     }
 
     private void ChangeViewFps()
@@ -96,6 +103,7 @@ public class ViewManager : MonoBehaviour {
         _cam.transform.rotation = _fps.rotation;
         _hand.SetActive(false);
         _isTps = false;
+        Debug.Log("?");
     }
 
     private void ChangeViewTps()
@@ -104,7 +112,6 @@ public class ViewManager : MonoBehaviour {
         _cam.transform.position = _tps.position;
         _cam.transform.rotation = _tps.rotation;
         _hand.SetActive(true);
-        _hand.transform.rotation = Quaternion.Euler(0,_arrow,0);
         _isTps = true;
     }
 }
