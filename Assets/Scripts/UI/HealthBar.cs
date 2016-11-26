@@ -9,7 +9,8 @@ public class HealthBar : MonoBehaviour
 
     public GameObject _me;
     public Image _bar;
-    public Text _target;
+    public Text _targetHp;
+    public Text _targetName;
 
     private int isUsed = 0;
 
@@ -38,7 +39,8 @@ public class HealthBar : MonoBehaviour
         isUsed++;
         //Debug.Log("VIEW UI : " + isUsed);
 
-        _target.text = name + " " + Mathf.Round((nowHp / maxHp) * 100);
+        _targetHp.text = nowHp + "/" + maxHp;
+        _targetName.text = name;
         _bar.rectTransform.sizeDelta = new Vector2(nowHp / maxHp * 1000, 100);
 
        // Debug.Log("CALC UI : " + isUsed + " : " + nowHp / maxHp);
