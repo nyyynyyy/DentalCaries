@@ -11,7 +11,7 @@ public class HealthBar : MonoBehaviour
     public Image _bar;
     public Text _target;
 
-    private bool isUsed;
+    private int isUsed = 0;
 
     void Start()
     {
@@ -21,15 +21,33 @@ public class HealthBar : MonoBehaviour
             return;
         }
         instance = this;
+
+        _me.SetActive(false);
     }
 
-    public IEnumerator ViewUi(float maxHp, float nowHp, string name)
+    public void ViewUi(float maxHp, float nowHp, string name)
     {
-        Debug.Log("VIEW");
-        if (!isUsed) _me.SetActive(true);
-        _target.text = name + " " + (nowHp / maxHp) * 100;
+      //  StopCoroutine("ViewTest");
+        StartCoroutine(WhileTimeView(maxHp, nowHp, name));
+    }
+
+    private IEnumerator WhileTimeView(float maxHp, float nowHp, string name)
+    {
+        if (isUsed == 0) _me.SetActive(true);
+
+        isUsed++;
+        //Debug.Log("VIEW UI : " + isUsed);
+
+        _target.text = name + " " + Mathf.Round((nowHp / maxHp) * 100);
         _bar.rectTransform.sizeDelta = new Vector2(nowHp / maxHp * 1000, 100);
+
+       // Debug.Log("CALC UI : " + isUsed + " : " + nowHp / maxHp);
         yield return new WaitForSeconds(3);
-        _me.SetActive(false);
+
+        isUsed--;
+
+       // Debug.Log("CLOSE UI" + isUsed);
+
+        if (isUsed == 0) _me.SetActive(false);
     }
 }
