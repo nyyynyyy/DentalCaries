@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 85ee5581153c904428f2d39de0429f6f
+timeCreated: 1480133964
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - 08SeoulHangang
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 132feb66b8b8df541919be5fa233ff3d, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
