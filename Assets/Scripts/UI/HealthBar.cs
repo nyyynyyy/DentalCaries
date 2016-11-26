@@ -25,6 +25,7 @@ public class HealthBar : MonoBehaviour
 
     public IEnumerator ViewUi(float maxHp, float nowHp, string name)
     {
+        Debug.Log("VIEW");
         if (!isUsed) _me.SetActive(true);
         _target.text = name + " " + (nowHp / maxHp) * 100;
         _bar.rectTransform.sizeDelta = new Vector2(nowHp / maxHp * 1000, 100);

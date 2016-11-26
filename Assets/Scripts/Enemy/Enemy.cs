@@ -63,8 +63,8 @@ public class Enemy : MonoBehaviour {
 			_nowHp = 0;
 			Death();
 		}
-		Debug.Log("asdf");
-		HealthBar.instance.ViewUi(maxHp, _nowHp, name);
+        if (name.Equals("") || name == null) name = "테스트용 복셀균";
+		StartCoroutine(HealthBar.instance.ViewUi(maxHp, _nowHp, name));
 	}
 
 	public void Death() {
