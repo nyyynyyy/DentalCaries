@@ -42,11 +42,18 @@ public class EnemyManager : MonoBehaviour {
     }
 
 	public void CreateDeathParticle(Transform transform) {
-		ParticleSystem particle = _deathParticlList.Find(o => o.gameObject.activeInHierarchy);
+		ParticleSystem particle = _deathParticlList.Find(o => !o.gameObject.activeInHierarchy);
+		StartCoroutine(ParticleActiveDelay(particle, deathParticleDeleteDelay));
+
 		particle.transform.position = transform.position;
 		particle.Play();
+	}
 
-
+	private IEnumerator ParticleActiveDelay(ParticleSystem particle, float delay) { 
+		particle.gameObject.SetActive(true);
+		yield return new WaitForSeconds(delay);
+		particle.Clear();
+		particle.gameObject.SetActive(false);
 	}
     
     private IEnumerator Round()
