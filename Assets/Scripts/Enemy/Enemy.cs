@@ -6,15 +6,17 @@ public class Enemy : MonoBehaviour {
 	public string name;
 
     [Header("State")]
-    public float moveSpeed = 3f;
-    public float attackSpeed = 1f;
-	public float attackPower = 2f;
-	public float maxHp = 3F;
+    public float _moveSpeed = 3f;
+    public float _attackSpeed = 1f;
+	public float _attackPower = 2f;
+
+	public float _maxHp = 3F;
+    private float _nowHp;
 
     private MoveEnemy _move;
 	private Rigidbody _rigidbody;
 
-	private float _nowHp;
+	
 
     void Awake()
     {
@@ -22,12 +24,14 @@ public class Enemy : MonoBehaviour {
 		_rigidbody = GetComponent<Rigidbody>();
     }
 
-    public void Spawn(Vector3 spawnPoint, Transform targetPoint,float speed)
+    public void Spawn(Vector3 spawnPoint, Transform targetPoint, float hp, float moveSpeed, float attackPower, float attackSpeed)
     {
 		transform.position = spawnPoint;
 		_move.SetTarget(targetPoint);
-		_nowHp = maxHp;
-        moveSpeed = speed;
+        _maxHp = _nowHp = hp;
+        _moveSpeed = moveSpeed;
+        _attackPower = attackPower;
+        _attackSpeed = attackSpeed;
 		_rigidbody.constraints = RigidbodyConstraints.None;
 
         gameObject.SetActive(true);
@@ -35,12 +39,12 @@ public class Enemy : MonoBehaviour {
 
     public IEnumerator HitHeart()
     {
-        moveSpeed = 0;
+        _moveSpeed = 0;
 		_rigidbody.constraints = RigidbodyConstraints.FreezeAll;
-		moveSpeed = 0;
+		_moveSpeed = 0;
 		while (!GameManager.instance.IsGame()) {
-			GameManager.instance.Damage(attackPower);
-			yield return new WaitForSeconds(attackSpeed);
+			GameManager.instance.Damage(_attackPower);
+			yield return new WaitForSeconds(_attackSpeed);
 			Debug.Log("DAMAGE");
 		}
     }
@@ -49,7 +53,7 @@ public class Enemy : MonoBehaviour {
 		_nowHp = Mathf.Max(_nowHp - amount, 0);
 
 		if (name.Equals("") || name == null) name = "테스트용 복셀균";
-		HealthBar.instance.ViewUi(maxHp, _nowHp, name);
+		HealthBar.instance.ViewUi(_maxHp, _nowHp, name);
 
 		if (_nowHp <= 0) {
 			Death();

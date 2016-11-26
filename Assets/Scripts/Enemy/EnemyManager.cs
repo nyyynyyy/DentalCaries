@@ -38,7 +38,7 @@ public class EnemyManager : MonoBehaviour {
 
         SetEnemy();
 		SetSpawnPoints();
-        StartCoroutine(Round());
+        //StartCoroutine(Round());
     }
 
 	public void CreateDeathParticle(Transform transform) {
@@ -55,20 +55,13 @@ public class EnemyManager : MonoBehaviour {
 		particle.Clear();
 		particle.gameObject.SetActive(false);
 	}
-    
-    private IEnumerator Round()
-    {
-        CreateEnemy();
-        yield return new WaitForSeconds(0.2F);
-        StartCoroutine(Round());
-    }
 
-    private void CreateEnemy()
+    public void CreateEnemy(float hp, float moveSpeed, float attackPower, float attackSpeed)
     {
 		Enemy selectedEnemy = _enemyList.Find(o => !o.gameObject.activeInHierarchy);
 		if (selectedEnemy && CanSpawnEnemy())
 		{
-			selectedEnemy.Spawn(UseSpawnPoint(selectedEnemy).position, heartPoint, 1f);
+			selectedEnemy.Spawn(UseSpawnPoint(selectedEnemy).position, heartPoint, hp, moveSpeed, attackPower, attackSpeed);
 			//side random move
 			System.Random random = new System.Random();
 			Vector3 randomPos = selectedEnemy.transform.position + (Vector3.right * random.Next(4));

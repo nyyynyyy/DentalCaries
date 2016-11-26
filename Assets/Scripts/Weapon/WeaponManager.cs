@@ -70,7 +70,7 @@ public class WeaponManager : MonoBehaviour {
 		// 무한 반복
 		while (true) {
 			// 마우스를 누르면 무기 발사
-			if (Input.GetMouseButtonDown(0) && !ViewManager.instance.isTps && Fire()) {
+			if (Input.GetMouseButtonDown(0) /*&& !ViewManager.instance.isTps*/ && Fire()) {
 				yield return _waitForFireDelay;
 			} else { 
 				yield return null;

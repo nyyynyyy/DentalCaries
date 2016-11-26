@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour {
     public float a = 1f;
 
     [Header("Player State")]
-    public float health = 100;
+    public float health = 1000;
     public float power = 1f;
 
     private int round = 1;
@@ -30,11 +30,19 @@ public class GameManager : MonoBehaviour {
 
     void Start () {
         Init();
-	}
+        StartCoroutine(Round());
+    }
 	
 	void Update () {
 	
 	}
+
+    private IEnumerator Round()
+    {
+        EnemyManager.instance.CreateEnemy(10, 0.5f, 1f, 1f);
+        yield return new WaitForSeconds(1F);
+        StartCoroutine(Round());
+    }
 
     private void Init()
     {
