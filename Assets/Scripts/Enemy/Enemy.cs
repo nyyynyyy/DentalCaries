@@ -3,9 +3,11 @@ using System.Collections;
 
 public class Enemy : MonoBehaviour {
 
-	public string name;
-
     [Header("State")]
+    public EnemyType _type;
+ 
+    public string _name = "테스트용 복셀균";
+
     public float _moveSpeed = 3f;
     public float _attackSpeed = 1f;
 	public float _attackPower = 2f;
@@ -16,12 +18,16 @@ public class Enemy : MonoBehaviour {
     private MoveEnemy _move;
 	private Rigidbody _rigidbody;
 
-	
 
     void Awake()
     {
         _move = GetComponent<MoveEnemy>();
 		_rigidbody = GetComponent<Rigidbody>();
+    }
+
+    public void Init(EnemyType type)
+    {
+        type = _type;
     }
 
     public void Spawn(Vector3 spawnPoint, Transform targetPoint, float hp, float moveSpeed, float attackPower, float attackSpeed)
@@ -52,8 +58,8 @@ public class Enemy : MonoBehaviour {
 	public void Damage(int amount) {
 		_nowHp = Mathf.Max(_nowHp - amount, 0);
 
-		if (name.Equals("") || name == null) name = "테스트용 복셀균";
-		HealthBar.instance.ViewUi(_maxHp, _nowHp, name);
+		if (_name.Equals("") || _name == null) _name = "테스트용 복셀균";
+		HealthBar.instance.ViewUi(_maxHp, _nowHp, _name);
 
 		if (_nowHp <= 0) {
 			Death();

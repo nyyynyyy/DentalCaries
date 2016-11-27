@@ -8,6 +8,8 @@ public class ViewManager : MonoBehaviour {
 
     public Camera _cam;
     public GameObject _hand;
+    public GameObject _weapon;
+    public GameObject _player;
 
     public Transform _fps;
     public Transform _tps;
@@ -41,6 +43,8 @@ public class ViewManager : MonoBehaviour {
     }
 
     void Start () {
+        Debug.Log("VIEW MANGER IS READY");
+
         Init();
     }
 	
@@ -102,8 +106,9 @@ public class ViewManager : MonoBehaviour {
         _cam.transform.position = _fps.position;
         _cam.transform.rotation = _fps.rotation;
         _hand.SetActive(false);
+        _weapon.SetActive(true);
+        _player.SetActive(false);
         _isTps = false;
-        Debug.Log("?");
     }
 
     private void ChangeViewTps()
@@ -112,6 +117,8 @@ public class ViewManager : MonoBehaviour {
         _cam.transform.position = _tps.position;
         _cam.transform.rotation = _tps.rotation;
         _hand.SetActive(true);
+        _weapon.SetActive(false);
+        _player.SetActive(true);
         _isTps = true;
     }
 }

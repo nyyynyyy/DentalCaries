@@ -10,14 +10,15 @@ public class EnemyManager : MonoBehaviour {
 	public Transform heartPoint;
 
     [Header("Enemy")]
-    public GameObject[] enemyUnit;
-    public int maxEnemy = 15;
+    public Transform enemys;
+    public GameObject[] enemyUnits;
 
 	[Header("Death Particle")]
 	public ParticleSystem deathParticle;
 	public float deathParticleDeleteDelay;
+    public int deathParticleMax;
 
-	[Header("SpawnPoint")]
+    [Header("SpawnPoint")]
 	public Transform playingPlace;
 
     private List<Enemy> _enemyList = new List<Enemy>();
@@ -26,22 +27,46 @@ public class EnemyManager : MonoBehaviour {
 	// spawnPoint
 	private List<Transform> _spawnPoints;
 
-	// Use this for initialization
-	void Start () {
-		if (instance) {
-			Debug.LogError("Already loaded instance: EnemyManager.cs");
-			return;
-		}
+    void Awake()
+    {
+        if (instance)
+        {
+            Debug.LogError("Already loaded instance: EnemyManager.cs");
+            return;
+        }
 
-		instance = this;
-		_spawnPoints = new List<Transform>();
+        instance = this;
 
-        SetEnemy();
-		SetSpawnPoints();
-        //StartCoroutine(Round());
+        _spawnPoints = new List<Transform>();
     }
 
-	public void CreateDeathParticle(Transform transform) {
+	void Start () {
+        Debug.Log("ENEMY MANGER IS READY");
+
+        SetParticle();
+        SetSpawnPoints();
+    }
+
+    #region Particle Method
+    private void SetParticle()
+    {
+        GameObject particleParent = new GameObject("DeathParticles");
+
+        for (int i = 0; i < deathParticleMax; i++)
+        {
+            GameObject particle = (GameObject)Instantiate(deathParticle.gameObject);
+
+            particle.name = "DeathParticle" + i;
+
+            particle.transform.parent = particleParent.transform;
+
+            _deathParticlList.Add(particle.GetComponent<ParticleSystem>());
+
+            particle.SetActive(false);
+        }
+    }
+
+    public void CreateDeathParticle(Transform transform) {
 		ParticleSystem particle = _deathParticlList.Find(o => !o.gameObject.activeInHierarchy);
 		StartCoroutine(ParticleActiveDelay(particle, deathParticleDeleteDelay));
 
@@ -55,10 +80,16 @@ public class EnemyManager : MonoBehaviour {
 		particle.Clear();
 		particle.gameObject.SetActive(false);
 	}
+    #endregion
 
-    public void CreateEnemy(float hp, float moveSpeed, float attackPower, float attackSpeed)
+    #region Enemy Method
+    public void CreateEnemy(EnemyType type, float hp, float moveSpeed, float attackPower, float attackSpeed)
     {
-		Enemy selectedEnemy = _enemyList.Find(o => !o.gameObject.activeInHierarchy);
+		Enemy selectedEnemy = _enemyList.Find(o => !o.gameObject.activeInHierarchy && o._type == type);
+        if (!selectedEnemy)
+        {
+            Debug.Log("Enemy is not ready :: Check Enemy List");
+        }
 		if (selectedEnemy && CanSpawnEnemy())
 		{
 			selectedEnemy.Spawn(UseSpawnPoint(selectedEnemy).position, heartPoint, hp, moveSpeed, attackPower, attackSpeed);
@@ -69,33 +100,35 @@ public class EnemyManager : MonoBehaviour {
 		}
     }
 
-    private void SetEnemy()
-    {
-        GameObject tempParent = new GameObject("Enemys");
-		GameObject tempParticleParent = new GameObject("DeathParticles");
-		tempParticleParent.transform.parent = tempParent.transform;
-
-        for (int i = 0; i < maxEnemy; i++)
+    public void SetEnemy(EnemyType type, int max) { 
+        for (int i = 0; i < max; i++)
         {
-            GameObject temp = (GameObject)Instantiate(enemyUnit[0], waitPoint.position, Quaternion.identity);
-            GameObject tempParticle = (GameObject)Instantiate(deathParticle.gameObject);
+            GameObject unit = (GameObject)Instantiate(enemyUnits[(int)type], waitPoint.position, Quaternion.identity);
+            Enemy enemy = unit.GetComponent<Enemy>();
 
-			temp.name = "Enemy" + i;
-			tempParticle.name = "DeathParticle" + i;
+            unit.name = type.ToString() + ":" + i;
+            unit.transform.parent = enemys;
 
-            temp.transform.parent = tempParent.transform;
-			tempParticle.transform.parent = tempParticleParent.transform;
+            enemy.Init(type);
+            _enemyList.Add(enemy);
 
-            _enemyList.Add(temp.GetComponent<Enemy>());
-			_deathParticlList.Add(tempParticle.GetComponent<ParticleSystem>());
-
-            temp.SetActive(false);
-			tempParticle.SetActive(false);
+            unit.SetActive(false);
         }
     }
 
-	/**** Spawn Point ****/
-	private bool CanSpawnEnemy() {
+    public void ClearEnemy()
+    {
+        for(int i = 0; i < _enemyList.Count; i++)
+        {
+            DestroyImmediate(_enemyList[i].gameObject);
+        }
+        _enemyList.Clear();
+    }
+    #endregion
+
+    #region INSI
+    /**** Spawn Point ****/
+    private bool CanSpawnEnemy() {
 		return _spawnPoints.Count > 0;
 	}
 
@@ -144,35 +177,5 @@ public class EnemyManager : MonoBehaviour {
 
 		_spawnPoints.Add(testObject.transform);
 	}
-	/********************/
-
-
-	//Junk Source
-	//private Vector3 GetSpawnPoint()
-	//{
-	//	Vector3 result;
-	//	int x = 0, y = 0;
-
-	//	switch (Random.Range(0, 4))
-	//	{
-	//		case 0: // N
-	//			x = Random.Range(-24, 24);
-	//			y = 14;
-	//			break;
-	//		case 1: // E
-	//			x = 14;
-	//			y = Random.Range(-24, 24);
-	//			break;
-	//		case 2: // S
-	//			x = Random.Range(-24, 24);
-	//			y = -14;
-	//			break;
-	//		case 3: // W
-	//			x = -14;
-	//			y = Random.Range(-24, 24);
-	//			break;
-	//	}
-	//	result = new Vector3(x, 2f, y);
-	//	return result;
-	//}
+    #endregion
 }
