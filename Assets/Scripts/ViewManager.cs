@@ -43,7 +43,7 @@ public class ViewManager : MonoBehaviour {
     }
 
     void Start () {
-        Debug.Log("VIEW MANGER IS READY");
+        Debug.Log("VIEW MANAGER IS READY");
 
         Init();
     }

@@ -38,10 +38,12 @@ public class EnemyManager : MonoBehaviour {
         instance = this;
 
         _spawnPoints = new List<Transform>();
+
     }
 
-	void Start () {
-        Debug.Log("ENEMY MANGER IS READY");
+    void Start () {
+        Debug.Log("ENEMY MANAGER IS READY");
+
 
         SetParticle();
         SetSpawnPoints();
@@ -83,7 +85,7 @@ public class EnemyManager : MonoBehaviour {
     #endregion
 
     #region Enemy Method
-    public void CreateEnemy(EnemyType type, float hp, float moveSpeed, float attackPower, float attackSpeed)
+    public void CreateEnemy(EnemyType type, string name, float hp, float moveSpeed, float attackPower, float attackSpeed, int gold)
     {
 		Enemy selectedEnemy = _enemyList.Find(o => !o.gameObject.activeInHierarchy && o._type == type);
         if (!selectedEnemy)
@@ -92,7 +94,7 @@ public class EnemyManager : MonoBehaviour {
         }
 		if (selectedEnemy && CanSpawnEnemy())
 		{
-			selectedEnemy.Spawn(UseSpawnPoint(selectedEnemy).position, heartPoint, hp, moveSpeed, attackPower, attackSpeed);
+			selectedEnemy.Spawn(UseSpawnPoint(selectedEnemy).position, heartPoint, name, hp, moveSpeed, attackPower, attackSpeed, gold);
 			//side random move
 			System.Random random = new System.Random();
 			Vector3 randomPos = selectedEnemy.transform.position + (Vector3.right * random.Next(4));

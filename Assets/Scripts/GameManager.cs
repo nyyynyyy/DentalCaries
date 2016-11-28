@@ -6,17 +6,37 @@ public class GameManager : MonoBehaviour {
 
     public static GameManager instance;
 
-    [Header("UI")]
-    public Text hpTxt;
-
     [Header("Game State")]
     [SerializeField] private int _round = 1;
+    [SerializeField] private int _money = 0;
 
     [Header("Player State")]
-    public float _health = 1000;
+    [SerializeField] private float _health = 1000;
     public float _power = 1f;
 
     private bool _isGame = false;
+
+    public int money
+    {
+        get
+        {
+            return _money;
+        }
+    }
+    public float hp
+    {
+        get
+        {
+            return _health;
+        }
+    }
+    public int round
+    {
+        get
+        {
+            return _round;
+        }
+    }
 
     void Awake()
     {
@@ -28,25 +48,21 @@ public class GameManager : MonoBehaviour {
     }
 
     void Start () {
-        Debug.Log("GAME MANGER IS READY");
+        Debug.Log("GAME MANAGER IS READY");
 
-        Init();
+        TextManager.instance.ResetUI();
     }
 
-    private void Init()
+    public void TakeMoney(int pay)
     {
-        UIReset();   
-    }
-
-    private void UIReset()
-    {
-        hpTxt.text = _health.ToString();
+        _money += pay;
+        TextManager.instance.ViewGold();
     }
 
     public void Damage(float damage)
     {
         _health -= damage;
-        UIReset();
+        TextManager.instance.ViewHp();
         if (_health <= 0) GameOver();
     }
 
@@ -58,11 +74,6 @@ public class GameManager : MonoBehaviour {
     public void GameOver()
     {
         _isGame = false;
-    }
-
-    public int NowRound()
-    {
-        return _round;
     }
 
     public void RoundClear()

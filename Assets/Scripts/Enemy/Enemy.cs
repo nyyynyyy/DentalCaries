@@ -6,14 +6,16 @@ public class Enemy : MonoBehaviour {
     [Header("State")]
     public EnemyType _type;
  
-    public string _name = "테스트용 복셀균";
+    private string _name;
 
-    public float _moveSpeed = 3f;
-    public float _attackSpeed = 1f;
-	public float _attackPower = 2f;
+    public float _moveSpeed;
+    private float _attackSpeed;
+    private float _attackPower;
 
-	public float _maxHp = 3F;
+    private float _maxHp;
     private float _nowHp;
+
+    private int _gold;
 
     private MoveEnemy _move;
 	private Rigidbody _rigidbody;
@@ -27,17 +29,19 @@ public class Enemy : MonoBehaviour {
 
     public void Init(EnemyType type)
     {
-        type = _type;
+        _type = type;
     }
 
-    public void Spawn(Vector3 spawnPoint, Transform targetPoint, float hp, float moveSpeed, float attackPower, float attackSpeed)
+    public void Spawn(Vector3 spawnPoint, Transform targetPoint, string name, float hp, float moveSpeed, float attackPower, float attackSpeed, int gold)
     {
 		transform.position = spawnPoint;
 		_move.SetTarget(targetPoint);
+        _name = name;
         _maxHp = _nowHp = hp;
         _moveSpeed = moveSpeed;
         _attackPower = attackPower;
         _attackSpeed = attackSpeed;
+        _gold = gold;
 		_rigidbody.constraints = RigidbodyConstraints.None;
 
         gameObject.SetActive(true);
@@ -58,7 +62,6 @@ public class Enemy : MonoBehaviour {
 	public void Damage(int amount) {
 		_nowHp = Mathf.Max(_nowHp - amount, 0);
 
-		if (_name.Equals("") || _name == null) _name = "테스트용 복셀균";
 		HealthBar.instance.ViewUi(_maxHp, _nowHp, _name);
 
 		if (_nowHp <= 0) {
@@ -70,6 +73,8 @@ public class Enemy : MonoBehaviour {
 		EnemyManager.instance.CreateDeathParticle(transform);
 
 		StopCoroutine(HitHeart());
+        RoundManager.instance.DeathUnit();
+        GameManager.instance.TakeMoney(_gold);
 		gameObject.SetActive(false);
 	}
 }
