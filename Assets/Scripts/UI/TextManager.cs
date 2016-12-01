@@ -8,6 +8,7 @@ public class TextManager : MonoBehaviour {
 
     public Text hp;
     public Text gold;
+    public Text attack;
     public Text round;
     public Text leftUnit;
 
@@ -36,6 +37,7 @@ public class TextManager : MonoBehaviour {
     {
         ViewHp();
         ViewGold();
+        ViewAttack();
         ViewRound();
         ViewLeftUnit();
     }
@@ -56,6 +58,11 @@ public class TextManager : MonoBehaviour {
     public void ViewGold()
     {
         gold.text = "GOLD: " + GameManager.instance.money.ToString();
+    }
+
+    public void ViewAttack()
+    {
+        attack.text = "ATTACK: " + GameManager.instance.power.ToString();
     }
 
     public void ViewRound()

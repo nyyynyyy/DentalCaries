@@ -16,7 +16,7 @@ public class DefaultBullet : Weapon {
 	}
 
 	public override void HitEnemy(Enemy enemy) {
-		enemy.Damage(1);
+		enemy.Damage((int)GameManager.instance.power);
 		Delete();
 	}
 

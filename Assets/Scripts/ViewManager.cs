@@ -90,7 +90,7 @@ public class ViewManager : MonoBehaviour {
             ChangeHandAngle();
         }
         else
-        { 
+        {
             _cam.transform.rotation = _fps.rotation;
         }
     }

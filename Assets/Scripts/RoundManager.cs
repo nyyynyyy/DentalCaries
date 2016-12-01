@@ -26,7 +26,7 @@ public struct Round{
 public class RoundManager : MonoBehaviour {
     public static RoundManager instance;
 
-    public GameObject shop;
+    public Shop shop;
 
     public Round[] round;
 
@@ -63,6 +63,7 @@ public class RoundManager : MonoBehaviour {
         for (int i = 0; i < round.wave.Length; i++)
         {
             EnemyManager.instance.SetEnemy(round.wave[i].type, round.wave[i].num);
+            _leftUnit += round.wave[i].num;
         }
 
         yield return StartCoroutine(TextManager.instance.ViewMessage(round.name));
@@ -72,7 +73,7 @@ public class RoundManager : MonoBehaviour {
             yield return StartCoroutine(Wave(round.wave[i]));
         }
 
-        //EnemyManager.instance.ClearEnemy();
+        EnemyManager.instance.ClearEnemy();
     }
 
     private IEnumerator Wave(Wave wave)
@@ -88,11 +89,22 @@ public class RoundManager : MonoBehaviour {
                 wave.attackSpeed, // attackSpeed
                 wave.gold
             );
-            _leftUnit++;
+            
             TextManager.instance.ViewLeftUnit();
             yield return new WaitForSeconds(0.2f);
         }
-        yield return new WaitForSeconds(wave.waveTime);
+
+        if (wave.waveTime < 0) // last wave
+        {
+            while(leftUnit > 0) // wait kill  all unit
+            {
+                yield return null; 
+            }
+        }
+        else // exist next wave
+        {
+            yield return new WaitForSeconds(wave.waveTime); // start next wave
+        }
     }
 
     public void DeathUnit()
@@ -113,8 +125,8 @@ public class RoundManager : MonoBehaviour {
     private IEnumerator OpenShop()
     {
         yield return new WaitForSeconds(4f);
-        shop.SetActive(true);
-        shop.SetActive(false);
+        shop.OpenShop();
+        yield return StartCoroutine(shop.WaitClose());
         StartCoroutine(Round(round[GameManager.instance.round]));
     }
 }

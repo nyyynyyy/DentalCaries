@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour {
 
     [Header("Player State")]
     [SerializeField] private float _health = 1000;
-    public float _power = 1f;
+    [SerializeField] private float _power = 1f;
 
     private bool _isGame = false;
 
@@ -35,6 +35,13 @@ public class GameManager : MonoBehaviour {
         get
         {
             return _round;
+        }
+    }
+    public float power
+    {
+        get
+        {
+            return _power;
         }
     }
 
@@ -79,5 +86,17 @@ public class GameManager : MonoBehaviour {
     public void RoundClear()
     {
         _round++;
+    }
+
+    public void PowerUp()
+    {
+        int pay = 100;
+        if (_money >= pay)
+        {
+            _power++;
+            _money -= pay;
+        }
+        TextManager.instance.ViewAttack();
+        TextManager.instance.ViewGold();
     }
 }
