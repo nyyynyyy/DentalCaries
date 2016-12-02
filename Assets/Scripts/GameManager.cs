@@ -117,7 +117,7 @@ public class GameManager : MonoBehaviour {
     public void PauseGame()
     {
         _gamePaues = true;
-        Time.timeScale = 0;
+        Time.timeScale = 0.2f;
     }
 
     public void ResumeGame()

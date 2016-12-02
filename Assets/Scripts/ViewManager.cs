@@ -12,6 +12,7 @@ public class ViewManager : MonoBehaviour {
     public GameObject _player;
 
     public Image _background;
+    public Image _headerBack;
 
     public Transform _fps;
     public Transform _tps;
@@ -122,12 +123,16 @@ public class ViewManager : MonoBehaviour {
 
     private void ChangeViewFps()
     {
-        if (!_isTps) return; 
+        if (!_isTps) return;
         _cam.transform.position = _fps.position;
         _cam.transform.rotation = _fps.rotation;
         _hand.SetActive(false);
         _weapon.SetActive(true);
         _player.SetActive(false);
+        if (!_blur.enabled)
+        {
+            _background.gameObject.SetActive(false);
+        }
         _isTps = false;
     }
 
@@ -139,6 +144,11 @@ public class ViewManager : MonoBehaviour {
         _hand.SetActive(true);
         _weapon.SetActive(false);
         _player.SetActive(true);
+        if (!_blur.enabled)
+        {
+            _background.gameObject.SetActive(true);
+            _background.color = new Color(50 / 255f, 50 / 255f, 50 / 255f, 50f / 255f);
+        }
         _isTps = true;
     }
 

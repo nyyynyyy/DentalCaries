@@ -25,6 +25,7 @@ public class HealthBar : MonoBehaviour
 
     private const float BAR_W = 500f;
     private const float BAR_H = 50f;
+    private const float DOWN_BAR = 15f;
 
     void Awake()
     {
@@ -82,7 +83,8 @@ public class HealthBar : MonoBehaviour
         }
 
         while (finishHp * 500f < _targetBar.rectTransform.sizeDelta.x && _targetId.Equals(id)) {
-            _targetBar.rectTransform.sizeDelta = new Vector2(_targetBar.rectTransform.sizeDelta.x - 5f, 50);
+            float barWeight = Mathf.Max(_targetBar.rectTransform.sizeDelta.x - DOWN_BAR, finishHp * BAR_W);
+            _targetBar.rectTransform.sizeDelta = new Vector2(barWeight, BAR_H);
             yield return null;
         }
 

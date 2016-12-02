@@ -25,7 +25,7 @@ public class MoveEnemy : MonoBehaviour {
     {
         if (other.tag == "Heart")
         {
-            Debug.Log("HIT HEART");
+            //Debug.Log("HIT HEART");
             StartCoroutine(_enemy.HitHeart());
         }
     }
