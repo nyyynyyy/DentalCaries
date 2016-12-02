@@ -11,6 +11,8 @@ public class ViewManager : MonoBehaviour {
     public GameObject _weapon;
     public GameObject _player;
 
+    public Image _background;
+
     public Transform _fps;
     public Transform _tps;
 
@@ -19,6 +21,8 @@ public class ViewManager : MonoBehaviour {
     private float _arrow;
 
     private bool _isTps = true;
+
+    private Blur _blur;
 
     private enum Arrow
     {
@@ -40,6 +44,8 @@ public class ViewManager : MonoBehaviour {
             Debug.LogError("Multi Instance Running.. : ViewManager");
         }
         instance = this;
+
+        _blur = _cam.gameObject.GetComponent<Blur>();
     }
 
     void Start () {
@@ -120,5 +126,29 @@ public class ViewManager : MonoBehaviour {
         _weapon.SetActive(false);
         _player.SetActive(true);
         _isTps = true;
+    }
+
+    public IEnumerator BlurOn()
+    {
+        _background.gameObject.SetActive(true);
+        while (_blur.iterations < 10)
+        {
+            _blur.iterations++;
+            _background.color = new Color(50 / 255f, 50 / 255f, 50 / 255f, (float) _blur.iterations * 15f / 255f);
+            yield return new WaitForSeconds(0.02f);
+        }
+        _blur.enabled = true;
+    }
+
+    public IEnumerator BlurOff()
+    {
+        while (_blur.iterations > 0)
+        {
+            _blur.iterations--;
+            _background.color = new Color(50 / 255f, 50 / 255f, 50 / 255f, (float)_blur.iterations * 15f / 255f);
+            yield return new WaitForSeconds(0.02f);
+        }
+        _background.gameObject.SetActive(false);
+        _blur.enabled = false;
     }
 }

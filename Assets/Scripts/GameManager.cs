@@ -11,7 +11,8 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private int _money = 0;
 
     [Header("Player State")]
-    [SerializeField] private float _health = 1000;
+    [SerializeField] private float _maxHealth = 1000f;
+    [SerializeField] private float _nowHealth = 1000f;
     [SerializeField] private float _power = 1f;
 
     private bool _isGame = false;
@@ -23,11 +24,18 @@ public class GameManager : MonoBehaviour {
             return _money;
         }
     }
-    public float hp
+    public float maxHp
     {
         get
         {
-            return _health;
+            return _maxHealth;
+        }
+    }
+    public float nowHp
+    {
+        get
+        {
+            return _nowHealth;
         }
     }
     public int round
@@ -56,8 +64,6 @@ public class GameManager : MonoBehaviour {
 
     void Start () {
         Debug.Log("GAME MANAGER IS READY");
-
-        TextManager.instance.ResetUI();
     }
 
     public void TakeMoney(int pay)
@@ -68,9 +74,9 @@ public class GameManager : MonoBehaviour {
 
     public void Damage(float damage)
     {
-        _health -= damage;
+        _nowHealth -= damage;
         TextManager.instance.ViewHp();
-        if (_health <= 0) GameOver();
+        if (_nowHealth <= 0) GameOver();
     }
 
     public bool IsGame()

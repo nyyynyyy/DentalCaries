@@ -30,8 +30,17 @@ public class RoundManager : MonoBehaviour {
 
     public Round[] round;
 
+    private int _roundUnit = 1;
     private int _leftUnit = 0;
 
+
+    public int leftPro
+    {
+        get
+        {
+            return 100 - (int)((float)_leftUnit / (float)_roundUnit * 100f);
+        }
+    }
     public int leftUnit
     {
         get
@@ -52,21 +61,38 @@ public class RoundManager : MonoBehaviour {
     void Start() {
         Debug.Log("ROUND MANAGER IS READY");
 
+        StartCoroutine(WaitAllStart());
+
+       // TextManager.instance.ViewLeftUnit();
+    }
+
+    private IEnumerator WaitAllStart()
+    {
+        yield return null;
         StartCoroutine(Round(round[GameManager.instance.round]));
 
-        TextManager.instance.ViewLeftUnit();
     }
 
     private IEnumerator Round(Round round)
     {
+
+        // yield return new WaitForSeconds(1f);
+
         TextManager.instance.ViewRound();
+
+        _roundUnit = 0;
+
         for (int i = 0; i < round.wave.Length; i++)
         {
             EnemyManager.instance.SetEnemy(round.wave[i].type, round.wave[i].num);
-            _leftUnit += round.wave[i].num;
+            _roundUnit += round.wave[i].num;
         }
 
+        _leftUnit = _roundUnit;
+
+        StartCoroutine(ViewManager.instance.BlurOn());
         yield return StartCoroutine(TextManager.instance.ViewMessage(round.name));
+        StartCoroutine(ViewManager.instance.BlurOff());
 
         for (int i = 0; i < round.wave.Length; i++)
         {
@@ -116,6 +142,7 @@ public class RoundManager : MonoBehaviour {
 
     private void RoundClear()
     {
+        StartCoroutine(ViewManager.instance.BlurOn());
         StartCoroutine(TextManager.instance.ViewMessage("시련 클리어"));
         GameManager.instance.TakeMoney(round[GameManager.instance.round].gold);
         GameManager.instance.RoundClear();

@@ -22,6 +22,7 @@ public class Shop : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             isUsed = false;
+            StartCoroutine(ViewManager.instance.BlurOff());
         }
         if (Input.GetKeyDown(KeyCode.A))
         {

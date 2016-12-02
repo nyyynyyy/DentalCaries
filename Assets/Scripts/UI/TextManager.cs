@@ -14,6 +14,9 @@ public class TextManager : MonoBehaviour {
 
     public Text message;
 
+    private GameManager _gm;
+    private RoundManager _rm;
+
     void Awake()
     {
         if (instance)
@@ -26,12 +29,22 @@ public class TextManager : MonoBehaviour {
     // Use this for initialization
     void Start () {
         Debug.Log("TEXT MANAGER IS READY");
+        _gm = GameManager.instance;
+        _rm = RoundManager.instance;
+
+        StartCoroutine(WaitAllStart());
     }
 
     // Update is called once per frame
     void Update () {
 	
 	}
+
+    private IEnumerator WaitAllStart()
+    {
+        yield return null;
+        ResetUI();
+    }
 
     public void ResetUI()
     {
@@ -52,26 +65,26 @@ public class TextManager : MonoBehaviour {
 
     public void ViewHp()
     {
-        hp.text = "HP: " + GameManager.instance.hp.ToString();
+        hp.text = _gm.nowHp.ToString() + " / " + _gm.maxHp.ToString();
     }
 
     public void ViewGold()
     {
-        gold.text = "GOLD: " + GameManager.instance.money.ToString();
+        gold.text = _gm.money.ToString();
     }
 
     public void ViewAttack()
     {
-        attack.text = "ATTACK: " + GameManager.instance.power.ToString();
+        attack.text = _gm.power.ToString();
     }
 
     public void ViewRound()
     {
-        round.text = "ROUND : " + (GameManager.instance.round + 1).ToString();
+        round.text = _rm.round[_gm.round].name.ToString();
     }
 
     public void ViewLeftUnit()
     {
-        leftUnit.text = "LEFT : " + RoundManager.instance.leftUnit.ToString();
+        leftUnit.text = _rm.leftPro.ToString() + "%";
     }
 }

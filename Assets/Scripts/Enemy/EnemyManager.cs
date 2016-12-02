@@ -27,6 +27,8 @@ public class EnemyManager : MonoBehaviour {
 	// spawnPoint
 	private List<Transform> _spawnPoints;
 
+    private int enemyIndex = 0;
+
     void Awake()
     {
         if (instance)
@@ -108,7 +110,7 @@ public class EnemyManager : MonoBehaviour {
             GameObject unit = (GameObject)Instantiate(enemyUnits[(int)type], waitPoint.position, Quaternion.identity);
             Enemy enemy = unit.GetComponent<Enemy>();
 
-            unit.name = type.ToString() + ":" + i;
+            unit.name = type.ToString() + ":" + enemyIndex++;
             unit.transform.parent = enemys;
 
             enemy.Init(type);

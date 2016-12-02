@@ -55,14 +55,14 @@ public class Enemy : MonoBehaviour {
 		while (!GameManager.instance.IsGame()) {
 			GameManager.instance.Damage(_attackPower);
 			yield return new WaitForSeconds(_attackSpeed);
-			Debug.Log("DAMAGE");
+		//	Debug.Log("DAMAGE");
 		}
     }
 
 	public void Damage(int amount) {
 		_nowHp = Mathf.Max(_nowHp - amount, 0);
 
-		HealthBar.instance.ViewUi(_maxHp, _nowHp, _name);
+		HealthBar.instance.ViewEnemyBar(_maxHp, _nowHp, amount, _name, transform.name);
 
 		if (_nowHp <= 0) {
 			Death();
