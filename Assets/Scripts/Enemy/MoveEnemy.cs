@@ -37,6 +37,10 @@ public class MoveEnemy : MonoBehaviour {
 
     private void Move()
     {
+		if (!CanMove ()) {
+			return;
+		}
+
         Vector3 movePosition;
 		float angle;
 
@@ -46,4 +50,9 @@ public class MoveEnemy : MonoBehaviour {
 		transform.position = movePosition;
 		transform.rotation = Quaternion.AngleAxis(angle, Vector3.up);
     }
+
+	private bool CanMove() {
+		RaycastHit hit;
+		return !Physics.Raycast (transform.position + Vector3.up * 0.5f, -transform.forward * 3F, out hit, 1.5F);
+	}
 }
