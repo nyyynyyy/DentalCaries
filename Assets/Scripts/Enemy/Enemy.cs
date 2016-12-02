@@ -7,7 +7,6 @@ public class Enemy : MonoBehaviour {
     public EnemyType _type;
  
     private string _name;
-
     public float _moveSpeed;
     private float _attackSpeed;
     private float _attackPower;
@@ -19,12 +18,13 @@ public class Enemy : MonoBehaviour {
 
     private MoveEnemy _move;
 	private Rigidbody _rigidbody;
-
+	private RigidbodyConstraints _rigidbodyBaseConstraints;
 
     void Awake()
     {
         _move = GetComponent<MoveEnemy>();
 		_rigidbody = GetComponent<Rigidbody>();
+		_rigidbodyBaseConstraints = GetComponent<Rigidbody>().constraints;
     }
 
     public void Init(EnemyType type)
@@ -42,14 +42,13 @@ public class Enemy : MonoBehaviour {
         _attackPower = attackPower;
         _attackSpeed = attackSpeed;
         _gold = gold;
-		_rigidbody.constraints = RigidbodyConstraints.None;
+		_rigidbody.constraints = _rigidbodyBaseConstraints;
 
         gameObject.SetActive(true);
     }
 
     public IEnumerator HitHeart()
     {
-        _moveSpeed = 0;
 		_rigidbody.constraints = RigidbodyConstraints.FreezeAll;
 		_moveSpeed = 0;
 		while (!GameManager.instance.IsGame()) {
