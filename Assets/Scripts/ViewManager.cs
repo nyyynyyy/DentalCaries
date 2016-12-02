@@ -19,6 +19,8 @@ public class ViewManager : MonoBehaviour {
 
     public float _speed;
 
+	public WeaponModelMove weaponModel;
+
     private float _arrow;
 
     private bool _isTps = true;
@@ -27,7 +29,7 @@ public class ViewManager : MonoBehaviour {
     private Blur _blur;
     private Blur _superBlur;
 
-    private enum Arrow
+    public enum Arrow
     {
         Right,
         Left,
@@ -102,6 +104,7 @@ public class ViewManager : MonoBehaviour {
 
     private void RotateView(Arrow arrow)
     {
+		weaponModel.RotateView(arrow);
         if (arrow == Arrow.Left) _arrow -= _speed;
         if (arrow == Arrow.Right) _arrow += _speed;
         _fps.rotation = Quaternion.Euler(_fps.rotation.eulerAngles.x, _arrow, 0);
