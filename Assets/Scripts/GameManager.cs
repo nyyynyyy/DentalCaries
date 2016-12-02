@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour {
     [Header("Game State")]
     [SerializeField] private int _round = 1;
     [SerializeField] private int _money = 0;
+    [SerializeField] private bool _gamePaues = false;
 
     [Header("Player State")]
     [SerializeField] private float _maxHealth = 1000f;
@@ -50,6 +51,13 @@ public class GameManager : MonoBehaviour {
         get
         {
             return _power;
+        }
+    }
+    public bool pause
+    {
+        get
+        {
+            return _gamePaues;
         }
     }
 
@@ -104,5 +112,17 @@ public class GameManager : MonoBehaviour {
         }
         TextManager.instance.ViewAttack();
         TextManager.instance.ViewGold();
+    }
+
+    public void PauseGame()
+    {
+        _gamePaues = true;
+        Time.timeScale = 0;
+    }
+
+    public void ResumeGame()
+    {
+        Time.timeScale = 1;
+        _gamePaues = false;
     }
 }

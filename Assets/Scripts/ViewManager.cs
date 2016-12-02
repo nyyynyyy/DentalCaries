@@ -22,7 +22,9 @@ public class ViewManager : MonoBehaviour {
 
     private bool _isTps = true;
 
+    private Blur[] _blurs;
     private Blur _blur;
+    private Blur _superBlur;
 
     private enum Arrow
     {
@@ -37,6 +39,14 @@ public class ViewManager : MonoBehaviour {
         }
     }
 
+    public bool isBlur
+    {
+        get
+        {
+            return _superBlur.enabled;
+        }
+    }
+
     void Awake()
     {
         if (instance)
@@ -45,7 +55,9 @@ public class ViewManager : MonoBehaviour {
         }
         instance = this;
 
-        _blur = _cam.gameObject.GetComponent<Blur>();
+        _blurs = _cam.GetComponents<Blur>();
+        _blur = _blurs[0];
+        _superBlur = _blurs[1];
     }
 
     void Start () {
@@ -66,6 +78,8 @@ public class ViewManager : MonoBehaviour {
 
     private void ReadyKey()
     {
+        if (GameManager.instance.pause) return;
+
         if (Input.GetKey(KeyCode.Space))
         {
             ChangeViewTps();
@@ -150,5 +164,28 @@ public class ViewManager : MonoBehaviour {
         }
         _background.gameObject.SetActive(false);
         _blur.enabled = false;
+    }
+
+    public IEnumerator SuperBlurOn()
+    {
+        while (_superBlur.iterations < 10)
+        {
+            _superBlur.iterations++;
+            yield return new WaitForSecondsRealtime(0.02f);
+           // Debug.Log("ON");
+        }
+        _superBlur.enabled = true;
+    }
+
+    public IEnumerator SuperBlurOff()
+    {
+        while (_superBlur.iterations > 0)
+        {
+            _superBlur.iterations--;
+            yield return new WaitForSecondsRealtime(0.02f);
+          //  Debug.Log("OFF");
+
+        }
+        _superBlur.enabled = false;
     }
 }
