@@ -10,15 +10,6 @@ public class Setting : MonoBehaviour {
     private IEnumerator _openCor;
     private IEnumerator _closeCor;
 
-	// Use this for initialization
-	void Start () {
-    }
-	
-	// Update is called once per frame
-	void Update () {
-        closeSetting();
-	}
-
     public void openSetting()
     {
         if (ViewManager.instance.isBlur) return;
@@ -38,7 +29,6 @@ public class Setting : MonoBehaviour {
 
     public void closeSetting()
     {
-        if (!Input.GetMouseButton(0)) return;
         if (!GameManager.instance.pause) return;
 
         GameManager.instance.ResumeGame();

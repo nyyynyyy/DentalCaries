@@ -76,7 +76,7 @@ public class RoundManager : MonoBehaviour {
     private IEnumerator Round(Round round)
     {
 
-        // yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(3f);
 
         TextManager.instance.ViewRound();
 

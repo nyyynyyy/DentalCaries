@@ -14,6 +14,8 @@ public class ViewManager : MonoBehaviour {
     public Image _background;
     public Image _headerBack;
 
+    public Canvas _fade;
+
     public Transform _fps;
     public Transform _tps;
 
@@ -24,6 +26,8 @@ public class ViewManager : MonoBehaviour {
     private float _arrow;
 
     private bool _isTps = true;
+
+    private CanvasGroup _fadeGroup;
 
     private Blur[] _blurs;
     private Blur _blur;
@@ -58,6 +62,8 @@ public class ViewManager : MonoBehaviour {
         }
         instance = this;
 
+        _fadeGroup = _fade.GetComponent<CanvasGroup>();
+
         _blurs = _cam.GetComponents<Blur>();
         _blur = _blurs[0];
         _superBlur = _blurs[1];
@@ -65,6 +71,8 @@ public class ViewManager : MonoBehaviour {
 
     void Start () {
         Debug.Log("VIEW MANAGER IS READY");
+
+        StartCoroutine(FadeOut());
 
         Init();
     }
@@ -200,5 +208,16 @@ public class ViewManager : MonoBehaviour {
 
         }
         _superBlur.enabled = false;
+    }
+
+    private IEnumerator FadeOut()
+    {
+        _fade.gameObject.SetActive(true);
+        while (_fadeGroup.alpha > 0)
+        {
+            _fadeGroup.alpha -= 0.01f;
+            yield return null;
+        }
+        _fade.gameObject.SetActive(false);
     }
 }
