@@ -32,7 +32,11 @@ public class WeaponModelMove : MonoBehaviour {
 		Target
 	}
 
-	private void Move() { 
+	private void Move() {
+		if (GameManager.instance.pause) {
+			return;
+		}
+
 		if (GetTimeDistance(_lastSetTargetTime) >= 0.85F) {
 			transform.localPosition = Vector3.Slerp(transform.localPosition, posBase, Time.deltaTime * 10);
 			transform.localRotation = Quaternion.Slerp(transform.localRotation, GetRotateQuaternion(_directionBase, RotationType.Base), Time.deltaTime * 5);
