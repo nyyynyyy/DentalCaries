@@ -52,6 +52,7 @@ public class MoveEnemy : MonoBehaviour {
     }
 
 	private bool CanMove() {
-		return !Physics.Raycast (transform.position + Vector3.up * 0.5f, -transform.forward * 3F, 1.5F);
+		RaycastHit hitInfo;
+		return !(Physics.Raycast (transform.position + Vector3.up * 0.5f, -transform.forward * 3F, out hitInfo, 1.5F) && hitInfo.transform.tag == "Enemy");
 	}
 }
