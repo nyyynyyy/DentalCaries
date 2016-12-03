@@ -7,8 +7,9 @@ public class WeaponModelMove : MonoBehaviour {
 	public Vector3 posAim;
 	public Vector3 directionBase;
 
-	[Header("Move Z-Axis Rotate")]
-	public float rotateViewValue;
+	[Header("Move Axis Rotate")]
+	public float rotateValue_base;
+	public float rotateValue_target;
 
 	private Quaternion _target;
 	private Quaternion _directionBase;
@@ -26,16 +27,21 @@ public class WeaponModelMove : MonoBehaviour {
 		Move();
 	}
 
+	private enum RotationType { 
+		Base,
+		Target
+	}
+
 	private void Move() { 
 		if (GetTimeDistance(_lastSetTargetTime) >= 0.85F) {
 			transform.localPosition = Vector3.Slerp(transform.localPosition, posBase, Time.deltaTime * 10);
-			transform.localRotation = Quaternion.Slerp(transform.localRotation, GetRotateQuaternion(_directionBase), Time.deltaTime * 5);
+			transform.localRotation = Quaternion.Slerp(transform.localRotation, GetRotateQuaternion(_directionBase, RotationType.Base), Time.deltaTime * 5);
 
 			return;
 		}
 
 		transform.localPosition = Vector3.Slerp(transform.localPosition, posAim, Time.deltaTime * 10);
-		transform.localRotation = Quaternion.Slerp(transform.localRotation, GetRotateQuaternion(_target), Time.deltaTime * 10);
+		transform.localRotation = Quaternion.Slerp(transform.localRotation, GetRotateQuaternion(_target, RotationType.Target), Time.deltaTime * 10);
 
 		Quaternion loc = transform.localRotation;
 		//loc.y = Mathf.Clamp(loc.y, -0.5f, 0.5f);
@@ -43,13 +49,22 @@ public class WeaponModelMove : MonoBehaviour {
 		transform.localRotation = loc;
 	}
 
-	private Quaternion GetRotateQuaternion(Quaternion origin) {
-		if (GetTimeDistance(_lastRotateViewTime) >= 0.1F) {
+	private Quaternion GetRotateQuaternion(Quaternion origin, RotationType rotationType) {
+		if (GetTimeDistance(_lastRotateViewTime) >= 0.05F) {
 			return origin;
 		}
 
+		float rotateValue = rotationType == RotationType.Base ? rotateValue_base : rotateValue_target;
+		if (_rotateViewArrow == ViewManager.Arrow.Left)
+			rotateValue *= -1;
+
 		Vector3 eulerAngles = origin.eulerAngles;
-		eulerAngles.z -= _rotateViewArrow == ViewManager.Arrow.Right ? rotateViewValue : -rotateViewValue;
+
+		if (rotationType == RotationType.Base) {
+			eulerAngles.z -= rotateValue;
+		} else {
+			eulerAngles.y -= rotateValue;
+		}
 
 		return Quaternion.Euler(eulerAngles);
 	}
