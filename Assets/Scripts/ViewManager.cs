@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class ViewManager : MonoBehaviour {
+public class ViewManager : MonoBehaviourC {
 
     public static ViewManager instance;
 
@@ -75,9 +75,11 @@ public class ViewManager : MonoBehaviour {
         StartCoroutine(FadeOut());
 
         Init();
+
+       // StartCoroutine(CheckKey());
     }
-	
-	void Update () {
+
+    void Update () {
         ReadyKey();
 	}
 
@@ -91,20 +93,20 @@ public class ViewManager : MonoBehaviour {
     {
         if (GameManager.instance.pause) return;
 
-        if (Input.GetKey(KeyCode.Space))
+        if (GetArea(PingerCode.Space))
         {
             ChangeViewTps();
             ChangeHandAngle();
         }
-        if (Input.GetKeyUp(KeyCode.Space))
+        else if(_tps)
         {
             ChangeViewFps();
         }
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (GetArea(PingerCode.Right))
         {
             RotateView(Arrow.Right);
         }
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (GetArea(PingerCode.Left))
         {
             RotateView(Arrow.Left);
         }
@@ -220,4 +222,34 @@ public class ViewManager : MonoBehaviour {
         }
         _fade.gameObject.SetActive(false);
     }
+
+    #region TouchUI
+    public void TouchDownRight()
+    {
+        AddPingerBuffer(PingerCode.Right);
+    }
+
+    public void TouchUpRight() {
+        RemovePingerBuffer(PingerCode.Right);
+    }
+
+    public void TouchDownLeft()
+    {
+        AddPingerBuffer(PingerCode.Left);
+    }
+
+    public void TouchUpLeft()
+    {
+        RemovePingerBuffer(PingerCode.Left);
+    }
+    public void TouchDownSpace()
+    {
+        AddPingerBuffer(PingerCode.Space);
+    }
+
+    public void TouchUpSPace()
+    {
+        RemovePingerBuffer(PingerCode.Space);
+    }
+    #endregion
 }

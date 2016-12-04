@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class TitleManager : MonoBehaviour {
+public class TitleManager : MonoBehaviourC {
 
     public Canvas title;
     public Canvas menu;
@@ -40,8 +40,8 @@ public class TitleManager : MonoBehaviour {
     }
 
     private void WaitTouch()
-    {
-        if (Input.GetMouseButton(0))
+    { 
+        if (GetPingerDown())
         {
             StartCoroutine(ChangeAnim());
         }

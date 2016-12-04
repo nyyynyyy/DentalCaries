@@ -2,34 +2,10 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class Shop : MonoBehaviour {
+public class Shop : MonoBehaviourC {
 
     public Text text;
     private bool isUsed = false;
-
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-        WaitInput();
-	}
-
-    private void WaitInput()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            isUsed = false;
-            StartCoroutine(ViewManager.instance.BlurOff());
-        }
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            Debug.Log("A");
-            GameManager.instance.PowerUp();
-        }
-    }
 
     public void OpenShop()
     {
@@ -52,4 +28,14 @@ public class Shop : MonoBehaviour {
         gameObject.SetActive(false);
     }
 
+    public void ClickExit()
+    {
+        isUsed = false;
+        StartCoroutine(ViewManager.instance.BlurOff());
+    }
+
+    public void ClickUpgrade()
+    {
+        GameManager.instance.PowerUp();
+    }
 }

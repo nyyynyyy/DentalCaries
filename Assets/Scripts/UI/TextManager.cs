@@ -14,6 +14,8 @@ public class TextManager : MonoBehaviour {
 
     public Text message;
 
+    public Text debug;
+
     private GameManager _gm;
     private RoundManager _rm;
 
@@ -86,5 +88,10 @@ public class TextManager : MonoBehaviour {
     public void ViewLeftUnit()
     {
         leftUnit.text = _rm.leftPro.ToString() + "%";
+    }
+
+    public void DebugMessaage(string msg)
+    {
+        debug.text = msg;
     }
 }
