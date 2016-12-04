@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
+
 
 public enum ViewType
 {
@@ -22,6 +25,9 @@ public class ViewManager : MonoBehaviourC {
 
     [Header("Shop")]
     public Shop _shop;
+
+    [Header("SideArea")]
+    public GameObject _side;
 
     [Header("Footer")]
     public GameObject _footer;
@@ -106,7 +112,8 @@ public class ViewManager : MonoBehaviourC {
 
     void Update () {
         ReadyKey();
-	}
+        TurnRotate();
+    }
 
     private void Init()
     {
@@ -117,6 +124,7 @@ public class ViewManager : MonoBehaviourC {
     private void ReadyKey()
     {
         if (GameManager.instance.pause) return;
+        if (viewMode == ViewType.MINE) return;
 
         if (GetArea(PingerCode.Right))
         {
@@ -129,21 +137,32 @@ public class ViewManager : MonoBehaviourC {
     }
 
     #region Rotate
+    private void TurnRotate()
+    {
+        if (_viewMode != ViewType.TPS) return;
+        if (!GetPinger()) return;
+        if (EventSystem.current.IsPointerOverGameObject()) return;
+
+        Vector3 inputPos = PingerPosition(0);
+        inputPos.z = 1f;
+        Vector3 worldPos = Camera.main.ScreenToWorldPoint(inputPos);
+
+        Debug.Log(worldPos);
+        Quaternion temp = Quaternion.LookRotation(worldPos);
+        _arrow = temp.eulerAngles.y;
+
+        _player.transform.rotation = Quaternion.Euler(_player.transform.rotation.eulerAngles.x, _arrow, 0);
+        _fps.rotation = Quaternion.Euler(_fps.rotation.eulerAngles.x, _arrow, 0);
+        ChangeHandAngle();
+    }
+
     private void RotateView(Arrow arrow)
     {
 		weaponModel.RotateView(arrow);
         if (arrow == Arrow.Left) _arrow -= _rotateSpeed;
         if (arrow == Arrow.Right) _arrow += _rotateSpeed;
         _fps.rotation = Quaternion.Euler(_fps.rotation.eulerAngles.x, _arrow, 0);
-
-        if (_viewMode == ViewType.TPS)
-        {
-            ChangeHandAngle();
-        }
-        else
-        {
-            _cam.transform.rotation = _fps.rotation;
-        }
+        _cam.transform.rotation = _fps.rotation;
     }
 
     private void ChangeHandAngle()
@@ -155,7 +174,6 @@ public class ViewManager : MonoBehaviourC {
     #region ChangeView
     private void ChangeViewFps()
     {
-        if (_viewMode == ViewType.FPS) return;
         _cam.transform.position = _fps.position;
         _cam.transform.rotation = _fps.rotation;
 
@@ -164,6 +182,7 @@ public class ViewManager : MonoBehaviourC {
         _player.SetActive(false);
         _mines.SetActive(false);
         _skill.SetActive(true);
+        _side.SetActive(true);
 
         if (!_blur.enabled)
         {
@@ -174,7 +193,7 @@ public class ViewManager : MonoBehaviourC {
 
     private void ChangeViewTps()
     {
-        if (_viewMode == ViewType.TPS) return;
+        if (_blur.enabled) return;
         _cam.transform.position = _tps.position;
         _cam.transform.rotation = _tps.rotation;
 
@@ -183,6 +202,7 @@ public class ViewManager : MonoBehaviourC {
         _player.SetActive(true);
         _skill.SetActive(false);
         _mines.SetActive(false);
+        _side.SetActive(false);
 
         if (!_blur.enabled)
         {
@@ -194,7 +214,6 @@ public class ViewManager : MonoBehaviourC {
 
     private void ChangeViweMine()
     {
-        if (_viewMode == ViewType.MINE) return;
         _cam.transform.position = _mine.position;
         _cam.transform.rotation = _mine.rotation;
 
@@ -203,18 +222,17 @@ public class ViewManager : MonoBehaviourC {
         _player.SetActive(true);
         _skill.SetActive(false);
         _mines.SetActive(true);
+        _side.SetActive(false);
 
         _shop.gameObject.SetActive(false);
         _mine.gameObject.SetActive(true);
         _viewChangeBtn.gameObject.SetActive(false);
 
-		StartCoroutine(BlurOff());
+        _blur.enabled = false;
 
-        if (!_blur.enabled)
-        {
-            _background.gameObject.SetActive(true);
-            _background.color = new Color(50 / 255f, 50 / 255f, 50 / 255f, 50f / 255f);
-        }
+        _background.gameObject.SetActive(true);
+        _background.color = new Color(50 / 255f, 50 / 255f, 50 / 255f, 50f / 255f);
+
         _viewMode = ViewType.MINE;
     }
     #endregion
@@ -241,6 +259,7 @@ public class ViewManager : MonoBehaviourC {
     #region Effect
     public IEnumerator BlurOn()
     {
+        ChangeViewFps();
         _background.gameObject.SetActive(true);
         while (_blur.iterations < 10)
         {

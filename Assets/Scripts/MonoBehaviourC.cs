@@ -95,6 +95,31 @@ public class MonoBehaviourC : MonoBehaviour {
 #endif
     }
 
+    protected bool GetPinger()
+    {
+#if UNITY_EDITOR
+        return Input.GetMouseButton(0);
+#elif UNITY_ANDROID
+        /*  for (int i = 0; i < 5; i++)
+                if (Input.GetTouch(i).phase != TouchPhase.Began) continue;
+                return true;
+            }
+            return false;*/
+            return Input.GetMouseButton(0);
+#elif UNITY_IOS
+            /*for (int i = 0; i < 5; i++)
+            {
+                if (Input.GetTouch(i).phase != TouchPhase.Began) continue;
+                return true;
+            }
+            return false;*/
+            return Input.GetMouseButton(0);
+#else
+        Debug.Log("Check your platform of device");
+        return false;
+#endif
+    }
+
     protected Vector3 PingerPosition(int pinger)
     {
 #if UNITY_EDITOR
