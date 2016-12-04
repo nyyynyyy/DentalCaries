@@ -29,6 +29,8 @@ public class LandMineMount : MonoBehaviourC {
 	private Vector3[,] _locArray;
 	private LandMine[,] _landMineArray;
 
+	private Transform _landMineStorage;
+
 	private Vector3 _selectorLoc;
 	private int _fieldLayerMask;
 	private float _blockSize;
@@ -44,6 +46,7 @@ public class LandMineMount : MonoBehaviourC {
 			throw new System.Exception("size is no odd number");
 		}
 
+		_landMineStorage = new GameObject().transform;
 		_locArray = new Vector3[size, size];
 		_landMineArray = new LandMine[size, size];
 		_selectorLoc = Vector3.zero;
@@ -53,12 +56,13 @@ public class LandMineMount : MonoBehaviourC {
 		ResizeSelector();
 
 		Vector3 mapCenter = map.position;
+		//float locY = transform.position.y;
 		for (int z = 0; z < size; z++) { 
 			for (int x = 0; x < size; x++) {
 				Vector3 loc = mapCenter;
 				loc.x = (x - size / 2) * _blockSize;
 				loc.z = (z - size / 2) * _blockSize;
-				loc.y = 1;
+				loc.y = -0.375f;
 
 				_locArray[x, z] = loc;
 			}
@@ -105,7 +109,7 @@ public class LandMineMount : MonoBehaviourC {
 
 			selector.position = _selectorLoc;
 			Color selectorColor;
-			if (_landMineArray[x, z] == null && GameManager.instance.money > 50) {
+			if (_landMineArray[x, z] == null && GameManager.instance.money >= 50) {
 				selectorColor = Color.green;
 				_currentPoint = point;
 			} else {
@@ -124,6 +128,7 @@ public class LandMineMount : MonoBehaviourC {
 		_currentPoint = emptyPoint;
 
 		LandMine landMine = Instantiate(landMinePrefab);
+		landMine.transform.SetParent(_landMineStorage);
 		landMine.transform.position = _locArray[point.x, point.z];
 		landMine.transform.localScale = landMine.transform.localScale * _blockSize;
 
