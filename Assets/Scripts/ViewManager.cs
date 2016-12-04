@@ -208,6 +208,8 @@ public class ViewManager : MonoBehaviourC {
         _mine.gameObject.SetActive(true);
         _viewChangeBtn.gameObject.SetActive(false);
 
+		StartCoroutine(BlurOff());
+
         if (!_blur.enabled)
         {
             _background.gameObject.SetActive(true);
@@ -333,8 +335,10 @@ public class ViewManager : MonoBehaviourC {
 
     public void TouchMineCalcle()
     {
+		
         ChangeViewFps();
         OpenShop();
+		StartCoroutine(BlurOn());
     }
 
     public void TouchExitShop()

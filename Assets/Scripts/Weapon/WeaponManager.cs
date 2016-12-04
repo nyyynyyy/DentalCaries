@@ -49,6 +49,10 @@ public class WeaponManager : MonoBehaviourC {
 		}
 	}
 
+	public static bool TryFire() {
+		return instance.Fire();
+	}
+
 	private bool Fire() {
 		if (_readyWeapons.Count <= 0 || GameManager.instance.pause) {
 			return false;

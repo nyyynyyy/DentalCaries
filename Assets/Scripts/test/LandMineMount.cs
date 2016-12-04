@@ -2,7 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LandMineMount : MonoBehaviour {
+public struct SelectPoint {
+	public int x, z;
+
+	public SelectPoint(int x, int y) {
+		this.x = x;
+		this.z = y;
+	}
+}
+
+public class LandMineMount : MonoBehaviourC {
 
 	[Header("Map")]
 	public Transform map;
@@ -23,6 +32,9 @@ public class LandMineMount : MonoBehaviour {
 	private Vector3 _selectorLoc;
 	private int _fieldLayerMask;
 	private float _blockSize;
+
+	private SelectPoint _currentPoint;
+	private SelectPoint emptyPoint = new SelectPoint(-1, -1);
 
 	// Use this for initialization
 	void Start () {
@@ -55,6 +67,16 @@ public class LandMineMount : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (ViewManager.instance.viewMode != ViewType.MINE) {
+			selector.gameObject.SetActive(false);
+			_currentPoint = emptyPoint;
+			return;
+		}
+
+		if (!GetPingerDown()) {
+			return;
+		}
+
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hitInfo;
 
@@ -62,36 +84,55 @@ public class LandMineMount : MonoBehaviour {
 			int x = Mathf.FloorToInt((hitInfo.point.x + _blockSize / 2) / _blockSize) + size / 2;
 			int z = Mathf.FloorToInt((hitInfo.point.z + _blockSize / 2) / _blockSize) + size / 2;
 
-			if (IsCenterLoc(x, z)) {
+			// Tiles: [0, 0] ~ [size, size]
+			SelectPoint point = new SelectPoint(x, z);
+
+			// 'heart' gameObject ignore place
+			if (IsCenterLoc(point)) {
 				return;
 			}
 
+			// mount landmine, and return
+			if (_currentPoint.Equals(point)) {
+				MountLandMine(point);
+				selector.gameObject.SetActive(false);
+				return;
+			}
+
+			// selector location and color setting
 			_selectorLoc.x = transform.position.x + (x - size / 2) * _blockSize;
 			_selectorLoc.z = transform.position.z + (z - size / 2) * _blockSize;
 
 			selector.position = _selectorLoc;
 			Color selectorColor;
-			if (_landMineArray[x, z] == null) {
+			if (_landMineArray[x, z] == null && GameManager.instance.money > 50) {
 				selectorColor = Color.green;
+				_currentPoint = point;
 			} else {
 				selectorColor = Color.red;
 			}
-			selectorColor.a = 0.5f;
 
 			selector.GetComponent<MeshRenderer>().material.color = selectorColor;
-
-			if (Input.GetMouseButtonDown(0)) {
-				LandMine landMine  = Instantiate(landMinePrefab);
-				landMine.transform.position = _locArray[x, z];
-				landMine.transform.localScale = landMine.transform.localScale * _blockSize;
-
-				_landMineArray[x, z] = landMine;
-			}
+			selector.gameObject.SetActive(true);
 		}
 	}
 
-	private bool IsCenterLoc(int x, int z) {
-		return IsCenter(x, size, centerLange) && IsCenter(z, size, centerLange);
+	private void MountLandMine(SelectPoint point) {
+		if (!GameManager.instance.SpendMoney(50)) {
+			return;
+		}
+		_currentPoint = emptyPoint;
+
+		LandMine landMine = Instantiate(landMinePrefab);
+		landMine.transform.position = _locArray[point.x, point.z];
+		landMine.transform.localScale = landMine.transform.localScale * _blockSize;
+
+		//RoundManager.instance.
+		_landMineArray[point.x, point.z] = landMine;
+	}
+
+	private bool IsCenterLoc(SelectPoint point) {
+		return IsCenter(point.x, size, centerLange) && IsCenter(point.z, size, centerLange);
 	}
 
 	private bool IsCenter(int value, int maxValue, int range) {

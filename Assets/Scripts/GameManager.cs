@@ -74,11 +74,18 @@ public class GameManager : MonoBehaviour {
         Debug.Log("GAME MANAGER IS READY");
     }
 
-    public void TakeMoney(int pay)
+    public void TakeMoney(int cost)
     {
-        _money += pay;
+        _money += cost;
         TextManager.instance.ViewGold();
     }
+
+	public bool SpendMoney(int pay) {
+		if (_money < pay)
+			return false;
+		_money -= pay;
+		return true;
+	}
 
     public void Damage(float damage)
     {

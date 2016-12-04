@@ -47,8 +47,7 @@ public class Enemy : MonoBehaviour {
         gameObject.SetActive(true);
     }
 
-    public IEnumerator HitHeart()
-    {
+    public IEnumerator HitHeart() {
 		_rigidbody.constraints = RigidbodyConstraints.FreezeAll;
 		_moveSpeed = 0;
 		while (!GameManager.instance.IsGame()) {
@@ -71,9 +70,13 @@ public class Enemy : MonoBehaviour {
 	public void Death() {
 		EnemyManager.instance.CreateDeathParticle(transform);
 
-		StopCoroutine(HitHeart());
-        RoundManager.instance.DeathUnit();
+		StopAllCoroutines();
+		RoundManager.instance.DeathUnit();
         GameManager.instance.TakeMoney(_gold);
 		gameObject.SetActive(false);
+	}
+
+	private IEnumerator DamageAnimation() {
+		yield return null;
 	}
 }
