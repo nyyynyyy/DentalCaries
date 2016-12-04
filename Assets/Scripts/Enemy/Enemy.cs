@@ -1,6 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public enum State {
+	Move,
+	Attack,
+	Idle
+}
+
 public class Enemy : MonoBehaviour {
 
     [Header("State")]
@@ -19,6 +25,7 @@ public class Enemy : MonoBehaviour {
     private MoveEnemy _move;
 	private Rigidbody _rigidbody;
 	private RigidbodyConstraints _rigidbodyBaseConstraints;
+	private State _state;
 
     void Awake()
     {
@@ -32,6 +39,10 @@ public class Enemy : MonoBehaviour {
         _type = type;
     }
 
+	public State state {
+		get { return _state; }
+	}
+
     public void Spawn(Vector3 spawnPoint, Transform targetPoint, string name, float hp, float moveSpeed, float attackPower, float attackSpeed, int gold)
     {
 		transform.position = spawnPoint;
@@ -44,16 +55,20 @@ public class Enemy : MonoBehaviour {
         _gold = gold;
 		_rigidbody.constraints = _rigidbodyBaseConstraints;
 
+		_state = State.Move;
+
+
         gameObject.SetActive(true);
     }
 
-    public IEnumerator HitHeart() {
+    public IEnumerator Attack() {
+		_state = State.Attack;
 		_rigidbody.constraints = RigidbodyConstraints.FreezeAll;
 		_moveSpeed = 0;
+
 		while (!GameManager.instance.IsGame()) {
 			GameManager.instance.Damage(_attackPower);
 			yield return new WaitForSeconds(_attackSpeed);
-		//	Debug.Log("DAMAGE");
 		}
     }
 
@@ -68,6 +83,8 @@ public class Enemy : MonoBehaviour {
 	}
 
 	public void Death() {
+		_state = State.Idle;
+
 		EnemyManager.instance.CreateDeathParticle(transform);
 
 		StopAllCoroutines();

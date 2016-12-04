@@ -84,6 +84,7 @@ public class GameManager : MonoBehaviour {
 		if (_money < pay)
 			return false;
 		_money -= pay;
+		TextManager.instance.ViewGold();
 		return true;
 	}
 

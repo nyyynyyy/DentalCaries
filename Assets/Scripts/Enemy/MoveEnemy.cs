@@ -18,15 +18,15 @@ public class MoveEnemy : MonoBehaviour {
 
     // Update is called once per frame
     void FixedUpdate () {
-        Move();
+		if (CanMove()) {
+			Move();
+		}
 	}
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "Heart")
-        {
-            //Debug.Log("HIT HEART");
-            StartCoroutine(_enemy.HitHeart());
+		if (CanMove() && other.tag == "Heart") {
+			StartCoroutine(_enemy.Attack());
         }
     }
 
@@ -37,10 +37,6 @@ public class MoveEnemy : MonoBehaviour {
 
     private void Move()
     {
-		if (!CanMove ()) {
-			return;
-		}
-
         Vector3 movePosition;
 		float angle;
 
@@ -53,6 +49,6 @@ public class MoveEnemy : MonoBehaviour {
 
 	private bool CanMove() {
 		RaycastHit hitInfo;
-		return !(Physics.Raycast (transform.position + Vector3.up * 0.5f, -transform.forward * 3F, out hitInfo, 1.5F) && hitInfo.transform.tag == "Enemy");
+		return !(Physics.Raycast (transform.position + Vector3.up * 0.5f, -transform.forward * 3F, out hitInfo, 1.5F) && hitInfo.transform.tag == "Enemy") && _enemy.state == State.Move;
 	}
 }
