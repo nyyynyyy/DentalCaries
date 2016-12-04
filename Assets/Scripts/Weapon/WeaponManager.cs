@@ -87,7 +87,7 @@ public class WeaponManager : MonoBehaviourC {
         // 무한 반복
         while (true) {
             // 마우스를 누르면 무기 발사
-             if (GetPingerDown() && !ViewManager.instance.isTps && Fire()) {
+             if (GetPingerDown() && ViewManager.instance.viewMode == ViewType.FPS && Fire()) {
                  yield return _waitForFireDelay;
              } else { 
                  yield return null;

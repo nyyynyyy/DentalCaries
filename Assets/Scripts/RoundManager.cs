@@ -26,8 +26,6 @@ public struct Round{
 public class RoundManager : MonoBehaviour {
     public static RoundManager instance;
 
-    public Shop shop;
-
     public Round[] round;
 
     private int _roundUnit = 1;
@@ -137,23 +135,20 @@ public class RoundManager : MonoBehaviour {
     {
         _leftUnit--;
         TextManager.instance.ViewLeftUnit();
-        if (_leftUnit == 0) RoundClear();
+        if (_leftUnit == 0) StartCoroutine(RoundClear());
     }
 
-    private void RoundClear()
+    private IEnumerator RoundClear()
     {
         StartCoroutine(ViewManager.instance.BlurOn());
-        StartCoroutine(TextManager.instance.ViewMessage("시련 클리어"));
+        yield return StartCoroutine(TextManager.instance.ViewMessage("시련 클리어"));
         GameManager.instance.TakeMoney(round[GameManager.instance.round].gold);
         GameManager.instance.RoundClear();
-        StartCoroutine(OpenShop());
+        ViewManager.instance.OpenShop();
     }
 
-    private IEnumerator OpenShop()
+    public void StartNextRound()
     {
-        yield return new WaitForSeconds(4f);
-        shop.OpenShop();
-        yield return StartCoroutine(shop.WaitClose());
         StartCoroutine(Round(round[GameManager.instance.round]));
     }
 }

@@ -10,28 +10,13 @@ public class Shop : MonoBehaviourC {
     public void OpenShop()
     {
         isUsed = true;
-        gameObject.SetActive(true);
     }
 
-    public IEnumerator WaitClose()
-    {
-        while (isUsed)
-        {
-            yield return null;
-        }
-
-        CloseShop();
-    }
-
-    private void CloseShop()
-    {
-        gameObject.SetActive(false);
-    }
-
-    public void ClickExit()
+    public void ExitShop()
     {
         isUsed = false;
         StartCoroutine(ViewManager.instance.BlurOff());
+        RoundManager.instance.StartNextRound();
     }
 
     public void ClickUpgrade()

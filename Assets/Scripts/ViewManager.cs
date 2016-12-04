@@ -2,30 +2,53 @@
 using UnityEngine.UI;
 using System.Collections;
 
+public enum ViewType
+{
+    TPS,
+    FPS,
+    MINE,
+}
+
 public class ViewManager : MonoBehaviourC {
 
     public static ViewManager instance;
 
+    [Header("Player")]
     public Camera _cam;
     public GameObject _hand;
     public GameObject _weapon;
     public GameObject _player;
+    public float _rotateSpeed;
 
+    [Header("Shop")]
+    public Shop _shop;
+
+    [Header("Footer")]
+    public GameObject _footer;
+    public GameObject _viewChangeBtn;
+    public GameObject _skill;
+
+    [Header("Mine")]
+    public GameObject _mines;
+
+    [Header("Background")]
     public Image _background;
     public Image _headerBack;
 
+    [Header("Fade")]
     public Canvas _fade;
 
+    [Header("Pos")]
     public Transform _fps;
     public Transform _tps;
+    public Transform _mine;
 
-    public float _speed;
-
+    [Header("Weapon")]
 	public WeaponModelMove weaponModel;
 
     private float _arrow;
 
-    private bool _isTps = true;
+    private ViewType _viewMode = ViewType.FPS;
 
     private CanvasGroup _fadeGroup;
 
@@ -39,10 +62,10 @@ public class ViewManager : MonoBehaviourC {
         Left,
     }
 
-    public bool isTps {
+    public ViewType viewMode {
         get
         {
-            return _isTps;
+            return _viewMode;
         }
     }
 
@@ -76,7 +99,9 @@ public class ViewManager : MonoBehaviourC {
 
         Init();
 
-       // StartCoroutine(CheckKey());
+#if UNITY_EDITOR
+         StartCoroutine(CheckKey());
+#endif
     }
 
     void Update () {
@@ -93,15 +118,6 @@ public class ViewManager : MonoBehaviourC {
     {
         if (GameManager.instance.pause) return;
 
-        if (GetArea(PingerCode.Space))
-        {
-            ChangeViewTps();
-            ChangeHandAngle();
-        }
-        else if(_tps)
-        {
-            ChangeViewFps();
-        }
         if (GetArea(PingerCode.Right))
         {
             RotateView(Arrow.Right);
@@ -112,14 +128,15 @@ public class ViewManager : MonoBehaviourC {
         }
     }
 
+    #region Rotate
     private void RotateView(Arrow arrow)
     {
 		weaponModel.RotateView(arrow);
-        if (arrow == Arrow.Left) _arrow -= _speed;
-        if (arrow == Arrow.Right) _arrow += _speed;
+        if (arrow == Arrow.Left) _arrow -= _rotateSpeed;
+        if (arrow == Arrow.Right) _arrow += _rotateSpeed;
         _fps.rotation = Quaternion.Euler(_fps.rotation.eulerAngles.x, _arrow, 0);
 
-        if (_isTps)
+        if (_viewMode == ViewType.TPS)
         {
             ChangeHandAngle();
         }
@@ -133,38 +150,93 @@ public class ViewManager : MonoBehaviourC {
     {
         _hand.GetComponent<RectTransform>().rotation = Quaternion.Euler(0, 0, -_arrow);
     }
+    #endregion
 
+    #region ChangeView
     private void ChangeViewFps()
     {
-        if (!_isTps) return;
+        if (_viewMode == ViewType.FPS) return;
         _cam.transform.position = _fps.position;
         _cam.transform.rotation = _fps.rotation;
+
         _hand.SetActive(false);
         _weapon.SetActive(true);
         _player.SetActive(false);
+        _mines.SetActive(false);
+        _skill.SetActive(true);
+
         if (!_blur.enabled)
         {
             _background.gameObject.SetActive(false);
         }
-        _isTps = false;
+        _viewMode = ViewType.FPS;
     }
 
     private void ChangeViewTps()
     {
-        if (_isTps) return;
+        if (_viewMode == ViewType.TPS) return;
         _cam.transform.position = _tps.position;
         _cam.transform.rotation = _tps.rotation;
+
         _hand.SetActive(true);
         _weapon.SetActive(false);
         _player.SetActive(true);
+        _skill.SetActive(false);
+        _mines.SetActive(false);
+
         if (!_blur.enabled)
         {
             _background.gameObject.SetActive(true);
             _background.color = new Color(50 / 255f, 50 / 255f, 50 / 255f, 50f / 255f);
         }
-        _isTps = true;
+        _viewMode = ViewType.TPS;
     }
 
+    private void ChangeViweMine()
+    {
+        if (_viewMode == ViewType.MINE) return;
+        _cam.transform.position = _mine.position;
+        _cam.transform.rotation = _mine.rotation;
+
+        _hand.SetActive(false);
+        _weapon.SetActive(false);
+        _player.SetActive(true);
+        _skill.SetActive(false);
+        _mines.SetActive(true);
+
+        _shop.gameObject.SetActive(false);
+        _mine.gameObject.SetActive(true);
+        _viewChangeBtn.gameObject.SetActive(false);
+
+        if (!_blur.enabled)
+        {
+            _background.gameObject.SetActive(true);
+            _background.color = new Color(50 / 255f, 50 / 255f, 50 / 255f, 50f / 255f);
+        }
+        _viewMode = ViewType.MINE;
+    }
+    #endregion
+
+    #region Shop
+    public void OpenShop()
+    {
+        _shop.gameObject.SetActive(true);
+        _footer.gameObject.SetActive(false);
+        _mine.gameObject.SetActive(false);
+        _viewChangeBtn.gameObject.SetActive(true);
+        _shop.OpenShop();
+    }
+
+    public void CloseShop()
+    {
+        _shop.gameObject.SetActive(false);
+        _footer.gameObject.SetActive(true);
+        _mine.gameObject.SetActive(false);
+        _viewChangeBtn.gameObject.SetActive(true);
+    }
+    #endregion
+
+    #region Effect
     public IEnumerator BlurOn()
     {
         _background.gameObject.SetActive(true);
@@ -195,7 +267,6 @@ public class ViewManager : MonoBehaviourC {
         {
             _superBlur.iterations++;
             yield return new WaitForSecondsRealtime(0.02f);
-           // Debug.Log("ON");
         }
         _superBlur.enabled = true;
     }
@@ -206,8 +277,6 @@ public class ViewManager : MonoBehaviourC {
         {
             _superBlur.iterations--;
             yield return new WaitForSecondsRealtime(0.02f);
-          //  Debug.Log("OFF");
-
         }
         _superBlur.enabled = false;
     }
@@ -222,6 +291,7 @@ public class ViewManager : MonoBehaviourC {
         }
         _fade.gameObject.SetActive(false);
     }
+    #endregion
 
     #region TouchUI
     public void TouchDownRight()
@@ -242,14 +312,35 @@ public class ViewManager : MonoBehaviourC {
     {
         RemovePingerBuffer(PingerCode.Left);
     }
-    public void TouchDownSpace()
+
+    public void TouchViewChange()
     {
-        AddPingerBuffer(PingerCode.Space);
+        if (_viewMode == ViewType.FPS)
+        {
+            ChangeViewTps();
+            ChangeHandAngle();
+        }
+        else if (_viewMode == ViewType.TPS)
+        {
+            ChangeViewFps();
+        }
     }
 
-    public void TouchUpSPace()
+    public void TouchViewMine()
     {
-        RemovePingerBuffer(PingerCode.Space);
+        ChangeViweMine();
+    }
+
+    public void TouchMineCalcle()
+    {
+        ChangeViewFps();
+        OpenShop();
+    }
+
+    public void TouchExitShop()
+    {
+        _shop.ExitShop();
+        CloseShop();
     }
     #endregion
 }

@@ -72,23 +72,16 @@ public class MonoBehaviourC : MonoBehaviour {
 
     protected bool GetPingerDown()
     {
-        if(Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.OSXEditor)
-        { // Editor
+#if UNITY_EDITOR
             return Input.GetMouseButtonDown(0);
-        }
-        if (Application.platform == RuntimePlatform.Android)
-        { // Android  
-          /*  for (int i = 0; i < 5; i++)
-            {
+#elif UNITY_ANDROID
+        /*  for (int i = 0; i < 5; i++)
                 if (Input.GetTouch(i).phase != TouchPhase.Began) continue;
                 return true;
             }
             return false;*/
             return Input.GetMouseButtonDown(0);
-
-        }
-        if (Application.platform == RuntimePlatform.IPhonePlayer)
-        { // ios
+#elif UNITY_IOS
             /*for (int i = 0; i < 5; i++)
             {
                 if (Input.GetTouch(i).phase != TouchPhase.Began) continue;
@@ -96,29 +89,25 @@ public class MonoBehaviourC : MonoBehaviour {
             }
             return false;*/
             return Input.GetMouseButtonDown(0);
-
-        }
+#else
         Debug.Log("Check your platform of device");
         return false;
+#endif
     }
 
     protected Vector3 PingerPosition(int pinger)
     {
-        if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.OSXEditor)
-        { // Editor
+#if UNITY_EDITOR
             return Input.mousePosition;
-        }
-        if (Application.platform == RuntimePlatform.Android)
-        { // android
+#elif UNITY_ANDROID
             return Input.mousePosition;
             //return Input.GetTouch(pinger).position;
-        }
-        if (Application.platform == RuntimePlatform.IPhonePlayer)
-        { // ios
+#elif UNITY_IOS
             return Input.GetTouch(pinger).position;
-        }
+#else
         Debug.Log("Check your platform of device");
         return Vector3.zero;
+#endif
     }
 
     protected bool GetArea(PingerCode area)
