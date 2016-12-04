@@ -73,7 +73,7 @@ public class HealthBar : MonoBehaviour
         _targetHp.text = nowHp + "/" + maxHp;
         _targetName.text = name;
 
-        float startHp = (nowHp + damage) / maxHp;
+        float startHp = Mathf.Max((nowHp + damage), maxHp) / maxHp;
         float finishHp =  nowHp / maxHp;
 
         if (!_targetId.Equals(id))

@@ -87,16 +87,16 @@ public class EnemyManager : MonoBehaviour {
     #endregion
 
     #region Enemy Method
-    public void CreateEnemy(EnemyType type, string name, float hp, float moveSpeed, float attackPower, float attackSpeed, int gold)
+    public void CreateEnemy(Wave wave)
     {
-		Enemy selectedEnemy = _enemyList.Find(o => !o.gameObject.activeInHierarchy && o._type == type);
+		Enemy selectedEnemy = _enemyList.Find(o => !o.gameObject.activeInHierarchy && o._type == wave.type);
         if (!selectedEnemy)
         {
             Debug.Log("Enemy is not ready :: Check Enemy List");
         }
 		if (selectedEnemy && CanSpawnEnemy())
 		{
-			selectedEnemy.Spawn(UseSpawnPoint(selectedEnemy).position, heartPoint, name, hp, moveSpeed, attackPower, attackSpeed, gold);
+			selectedEnemy.Spawn(UseSpawnPoint(selectedEnemy).position, heartPoint, wave);
 			//side random move
 			System.Random random = new System.Random();
 			Vector3 randomPos = selectedEnemy.transform.position + (Vector3.right * random.Next(4));

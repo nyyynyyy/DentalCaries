@@ -7,6 +7,7 @@ public struct Wave
 {
     public string name;
     public EnemyType type;
+    public EnmeyAbility ability;
     public int num;
     public int hp;
     public float moveSpeed;
@@ -105,13 +106,7 @@ public class RoundManager : MonoBehaviour {
         for (int i = 0; i < wave.num; i++)
         {
             EnemyManager.instance.CreateEnemy(
-                wave.type, // type
-                wave.name, // name
-                wave.hp, // hp
-                wave.moveSpeed, // moveSpeed
-                wave.attackPower, // attackPower
-                wave.attackSpeed, // attackSpeed
-                wave.gold
+                wave
             );
             
             TextManager.instance.ViewLeftUnit();

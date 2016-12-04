@@ -7,11 +7,22 @@ public enum State {
 	Idle
 }
 
+public enum EnmeyAbility
+{
+    Normal,
+    Fast,
+    Slow,
+    Strong,
+    Super,
+}
+
 public class Enemy : MonoBehaviour {
 
     [Header("State")]
     public EnemyType _type;
- 
+
+    private EnmeyAbility _ability;
+
     private string _name;
     public float _moveSpeed;
     private float _attackSpeed;
@@ -43,22 +54,60 @@ public class Enemy : MonoBehaviour {
 		get { return _state; }
 	}
 
-    public void Spawn(Vector3 spawnPoint, Transform targetPoint, string name, float hp, float moveSpeed, float attackPower, float attackSpeed, int gold)
+    public void Spawn(Vector3 spawnPoint, Transform targetPoint, Wave wave)
     {
 		transform.position = spawnPoint;
 		_move.SetTarget(targetPoint);
-        _name = name;
-        _maxHp = _nowHp = hp;
-        _moveSpeed = moveSpeed;
-        _attackPower = attackPower;
-        _attackSpeed = attackSpeed;
-        _gold = gold;
+        _ability = wave.ability;
+        _maxHp = _nowHp = wave.hp;
+        _moveSpeed = wave.moveSpeed;
+        _attackPower = wave.attackPower;
+        _attackSpeed = wave.attackSpeed;
+        _gold = wave.gold;
 		_rigidbody.constraints = _rigidbodyBaseConstraints;
+
+        MixAbility(wave.ability, wave.name);
 
 		_state = State.Move;
 
 
         gameObject.SetActive(true);
+    }
+
+    private void MixAbility(EnmeyAbility ability, string name)
+    {
+        switch (ability)
+        {
+            case EnmeyAbility.Normal:
+                _name =  name;
+                break;
+            case EnmeyAbility.Fast:
+                _name = "[빠른] " + name;
+                _moveSpeed *= 1.5f;
+                _gold *= 2;
+                break;
+            case EnmeyAbility.Slow:
+                _name = "[느린] " + name;
+                _moveSpeed *= 0.5f;
+                _attackPower *= 2f;
+                break;
+            case EnmeyAbility.Strong:
+                _name = "[튼튼] " + name;
+                _maxHp *= 3f;
+                _nowHp = _maxHp;
+                _gold *= 2;
+                break;
+            case EnmeyAbility.Super:
+                _name = "[슈퍼] " + name;
+                _maxHp *= 50f;
+                _nowHp = _maxHp;
+                _gold *= 30;
+                transform.localScale = new Vector3(3f, 3f, 3f);
+                break;
+            default:
+                _name = "[버그]피드백부탁";
+                break;
+        }
     }
 
     public IEnumerator Attack() {
