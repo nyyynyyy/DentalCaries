@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Button))]
@@ -18,18 +19,34 @@ public class SkillButton : MonoBehaviour {
 		SkillReady();
 	}
 
-	void Update() {
-		if (_cooldownTimeLeft <= 0) {
-			SkillReady();
-		} else {
-			Cooldown(Time.deltaTime);
-		}
-	}
-
 	private void SkillReady() {
 		cooldownTextDisplay.enabled = false;
 		darkMask.enabled = false;
 		_button.interactable = true;
+	}
+
+	public void OnButtonDown() {
+		_button.interactable = false;
+		StartCoroutine(TriggerButton());
+	}
+
+	private IEnumerator TriggerButton() { 
+		yield return skill.TriggerSkill();
+
+		_cooldownTimeLeft = skill.cooldown;
+		darkMask.enabled = true;
+		cooldownTextDisplay.enabled = true;
+
+		yield return Cooldown();
+	}
+
+	private IEnumerator Cooldown() {
+		while (_cooldownTimeLeft > 0) { 
+			Cooldown(Time.deltaTime);
+			yield return null;
+		}
+
+		SkillReady();
 	}
 
 	private void Cooldown(float time) {
@@ -37,15 +54,5 @@ public class SkillButton : MonoBehaviour {
 
 		cooldownTextDisplay.text = (Mathf.Floor(_cooldownTimeLeft) + 1).ToString();
 		darkMask.fillAmount = (_cooldownTimeLeft / skill.cooldown);
-	}
-
-	public void TriggerButton() {
-		_cooldownTimeLeft = skill.cooldown;
-
-		_button.interactable = false;
-		darkMask.enabled = true;
-		cooldownTextDisplay.enabled = true;
-
-		skill.TriggerSkill();
 	}
 }

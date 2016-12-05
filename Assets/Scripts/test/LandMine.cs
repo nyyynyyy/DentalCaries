@@ -1,14 +1,18 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class LandMine : MonoBehaviour {
-
-	[Header("Attack")]
-	public int damage;
-	public float delay;
+	private int _damage;
+	private float _delay;
 
 	private bool _attackPosible = true;
+	private int _upgradeUnit = 0;
+
+	public void Init(LandMineData data) {
+		_damage = data.damage;
+		_delay = data.delay;
+	}
 
 	void OnTriggerStay(Collider other) {
 		EnemyCheck(other);
@@ -23,14 +27,14 @@ public class LandMine : MonoBehaviour {
 
 	private void HitEnemy(Enemy enemy) {
 		if (_attackPosible) {
-			enemy.Damage(damage);
+			enemy.Damage(_damage);
 			StartCoroutine(AttackDelay());
 		}
 	}
 
 	IEnumerator AttackDelay() {
 		_attackPosible = false;
-		yield return new WaitForSeconds(delay);
+		yield return new WaitForSeconds(_delay);
 		_attackPosible = true;
 	}
 }

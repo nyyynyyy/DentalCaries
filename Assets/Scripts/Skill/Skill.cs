@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Skill : ScriptableObject {
+public abstract class Skill : MonoBehaviourC {
 
-	public string skillName;
 	public float cooldown;
 
 	public abstract void Init();
-	public abstract void TriggerSkill();
+	public abstract IEnumerator TriggerSkill();
 }

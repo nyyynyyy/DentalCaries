@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu (menuName="Skills/RageFireSkill")]
 public class RageFireSkill : Skill {
 
 	[Header("Option")]
@@ -14,7 +13,15 @@ public class RageFireSkill : Skill {
 		
 	}
 
-	public override void TriggerSkill() {
-		
+	public override IEnumerator TriggerSkill() {
+		yield return StartCoroutine(Fire());
+	}
+
+	private IEnumerator Fire() {
+		WaitForSeconds waitSec = new WaitForSeconds(fireDelay);
+		for (int count = 0; count < fireCount; count++) {
+			WeaponManager.TryFire();
+			yield return waitSec;
+		}
 	}
 }
