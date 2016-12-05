@@ -36,6 +36,11 @@ public class ViewManager : MonoBehaviourC {
 
     [Header("Mine")]
     public GameObject _mines;
+    public GameObject _mineCancle;
+    public GameObject _mineUndo;
+    public GameObject _mineRemove;
+    public GameObject _mineUpgrade;
+    public GameObject _mineAdd;
 
     [Header("Background")]
     public Image _background;
@@ -141,7 +146,11 @@ public class ViewManager : MonoBehaviourC {
     {
         if (_viewMode != ViewType.TPS) return;
         if (!GetPinger()) return;
+#if UNITY_EDITOR
         if (EventSystem.current.IsPointerOverGameObject()) return;
+#elif UNITY_ANDROID
+        if (EventSystem.current.IsPointerOverGameObject(0)) return;
+#endif
 
         Vector3 inputPos = PingerPosition(0);
         inputPos.z = 1f;
@@ -169,7 +178,7 @@ public class ViewManager : MonoBehaviourC {
     {
         _hand.GetComponent<RectTransform>().rotation = Quaternion.Euler(0, 0, -_arrow);
     }
-    #endregion
+#endregion
 
     #region ChangeView
     private void ChangeViewFps()
@@ -228,12 +237,47 @@ public class ViewManager : MonoBehaviourC {
         _mine.gameObject.SetActive(true);
         _viewChangeBtn.gameObject.SetActive(false);
 
+        Unselected();
+
         _blur.enabled = false;
 
         _background.gameObject.SetActive(true);
         _background.color = new Color(50 / 255f, 50 / 255f, 50 / 255f, 50f / 255f);
 
         _viewMode = ViewType.MINE;
+    }
+    #endregion
+
+    #region Mine
+    public void Unselected()
+    {
+        _mineAdd.SetActive(false);
+        _mineUpgrade.SetActive(false);
+        _mineRemove.SetActive(false);
+    }
+
+    public void SelectedMine()
+    {
+        _mineAdd.SetActive(false);
+        _mineUpgrade.SetActive(true);
+        _mineRemove.SetActive(true);
+    }
+
+    public void SelectedGrid()
+    {
+        _mineAdd.SetActive(true);
+        _mineUpgrade.SetActive(false);
+        _mineRemove.SetActive(false);
+    }
+
+    public void ChanceUndo()
+    {
+        _mineUndo.SetActive(true);
+    }
+
+    public void LeaveUndo()
+    {
+        _mineUndo.SetActive(false);
     }
     #endregion
 
@@ -254,7 +298,7 @@ public class ViewManager : MonoBehaviourC {
         _mine.gameObject.SetActive(false);
         _viewChangeBtn.gameObject.SetActive(true);
     }
-    #endregion
+#endregion
 
     #region Effect
     public IEnumerator BlurOn()
@@ -312,7 +356,7 @@ public class ViewManager : MonoBehaviourC {
         }
         _fade.gameObject.SetActive(false);
     }
-    #endregion
+#endregion
 
     #region TouchUI
     public void TouchDownRight()
@@ -365,5 +409,5 @@ public class ViewManager : MonoBehaviourC {
         _shop.ExitShop();
         CloseShop();
     }
-    #endregion
+#endregion
 }
