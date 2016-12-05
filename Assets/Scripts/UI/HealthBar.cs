@@ -14,6 +14,7 @@ public class HealthBar : MonoBehaviour
     [Header("Enemy")]
     public GameObject _targetHpBar;
     public Image _targetBar;
+    public Image _targetMoveBar;
     public Text _targetHp;
     public Text _targetName;
 
@@ -24,7 +25,8 @@ public class HealthBar : MonoBehaviour
     private GameManager _gm;
 
     private const float BAR_W = 500f;
-    private const float BAR_H = 50f;
+    private const float BAR_H = 35f;
+    private const float MOVE_BAR_H = 5f;
     private const float DOWN_BAR = 15f;
 
     void Awake()
@@ -45,10 +47,10 @@ public class HealthBar : MonoBehaviour
         StartCoroutine(UpdateBar());
     }
 
-    public void ViewEnemyBar(float maxHp, float nowHp, float damage, string name, string id)
+    public void ViewEnemyBar(Enemy enemy, float damage)
     {
-      //  StopCoroutine("ViewTest");
-        StartCoroutine(WhileTimeScreen(maxHp, nowHp, damage, name, id));
+        StartCoroutine(WhileTimeScreen(enemy, damage));
+        StartCoroutine(DisBar(enemy));
     }
 
     private IEnumerator UpdateBar()
@@ -57,48 +59,64 @@ public class HealthBar : MonoBehaviour
         {
             if (_gm.nowHp / _gm.maxHp * BAR_W < _playerBar.rectTransform.sizeDelta.x)
             {
-                _playerBar.rectTransform.sizeDelta = new Vector2(_playerBar.rectTransform.sizeDelta.x - 5f, BAR_H);
+                _playerBar.rectTransform.sizeDelta = new Vector2(_playerBar.rectTransform.sizeDelta.x - 5f, BAR_H + MOVE_BAR_H);
             }
             yield return null;
         }
     }
 
-    private IEnumerator WhileTimeScreen(float maxHp, float nowHp, float damage, string name, string id)
+    private IEnumerator WhileTimeScreen(Enemy enemy, float damage)
     {
         if (isUsed == 0) _targetHpBar.SetActive(true);
 
         isUsed++;
         //Debug.Log("VIEW UI : " + isUsed);
 
-        _targetHp.text = nowHp + "/" + maxHp;
-        _targetName.text = name;
+        _targetHp.text = enemy.nowHp + " / " + enemy.maxHp;
+        _targetName.text = enemy.name;
 
-        float startHp = Mathf.Max((nowHp + damage), maxHp) / maxHp;
-        float finishHp =  nowHp / maxHp;
+        float startHp = Mathf.Max((enemy.nowHp + damage), enemy.maxHp) / enemy.maxHp;
+        float finishHp = enemy.nowHp / enemy.maxHp;
 
-        if (!_targetId.Equals(id))
+        if (!_targetId.Equals(enemy.transform.name)) // new enemy bar
         {
             _targetBar.rectTransform.sizeDelta = new Vector2(startHp * BAR_W, BAR_H);
-            _targetId = id;
+            _targetId = enemy.transform.name;
         }
 
-        while (finishHp * 500f < _targetBar.rectTransform.sizeDelta.x && _targetId.Equals(id)) {
+        while (finishHp * BAR_W < _targetBar.rectTransform.sizeDelta.x) {
+            if (!_targetId.Equals(enemy.transform.name)) break;
             float barWeight = Mathf.Max(_targetBar.rectTransform.sizeDelta.x - DOWN_BAR, finishHp * BAR_W);
             _targetBar.rectTransform.sizeDelta = new Vector2(barWeight, BAR_H);
             yield return null;
+
+            if (!RoundManager.instance.isPlayingRound) { // when finish Round
+                isUsed = 0;
+                _targetHpBar.SetActive(false);
+                yield break;
+            }
         }
 
-        if (_targetId.Equals(id))
+        if (_targetId.Equals(enemy.transform.name))
         {
             _targetBar.rectTransform.sizeDelta = new Vector2(finishHp * BAR_W, BAR_H);
         }
-        // Debug.Log("CALC UI : " + isUsed + " : " + nowHp / maxHp);
-        yield return new WaitForSeconds(3);
+
+        yield return new WaitForSeconds(3); // during 3 sec view screen
 
         isUsed--;
 
-       // Debug.Log("CLOSE UI" + isUsed);
-
         if (isUsed == 0) _targetHpBar.SetActive(false);
+    }
+
+    private IEnumerator DisBar(Enemy enemy)
+    {
+        while (_targetBar.IsActive())
+        {
+            if (!_targetId.Equals(enemy.transform.name)) yield break;
+            if (enemy.isDeath) yield break;
+            _targetMoveBar.rectTransform.sizeDelta = new Vector2(enemy.leftDis * BAR_W, MOVE_BAR_H);
+            yield return null;
+        }
     }
 }

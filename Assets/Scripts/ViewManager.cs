@@ -23,6 +23,9 @@ public class ViewManager : MonoBehaviourC {
     public GameObject _player;
     public float _rotateSpeed;
 
+    [Header("Header")]
+    public Image _leftUnit;
+
     [Header("Shop")]
     public Shop _shop;
 
@@ -66,6 +69,10 @@ public class ViewManager : MonoBehaviourC {
     private Blur[] _blurs;
     private Blur _blur;
     private Blur _superBlur;
+
+    private const float BAR_W = 1800f;
+    private const float BAR_H = 5f;
+    private const float UP_BAR = 9f;
 
     public enum Arrow
     {
@@ -123,6 +130,7 @@ public class ViewManager : MonoBehaviourC {
     private void Init()
     {
         _arrow = _fps.rotation.eulerAngles.y;
+        _leftUnit.rectTransform.sizeDelta = new Vector2(0, BAR_H);
         ChangeViewFps();
     }
 
@@ -246,6 +254,18 @@ public class ViewManager : MonoBehaviourC {
 
         _viewMode = ViewType.MINE;
     }
+    #endregion
+
+    #region Header
+    public IEnumerator MoveProgress()
+    {
+        while (RoundManager.instance.leftPro * BAR_W > _leftUnit.rectTransform.sizeDelta.x)
+        {
+            float barWeight = Mathf.Min(_leftUnit.rectTransform.sizeDelta.x + UP_BAR, BAR_W);
+            _leftUnit.rectTransform.sizeDelta = new Vector2(barWeight, BAR_H);
+            yield return null;
+        }
+    } 
     #endregion
 
     #region Mine

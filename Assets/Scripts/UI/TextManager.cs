@@ -85,6 +85,6 @@ public class TextManager : MonoBehaviour {
 
     public void ViewLeftUnit()
     {
-        leftUnit.text = _rm.leftPro.ToString() + "%";
+       // leftUnit.text = _rm.leftPro.ToString() + "%";
     }
 }

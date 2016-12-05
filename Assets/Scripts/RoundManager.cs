@@ -32,12 +32,13 @@ public class RoundManager : MonoBehaviour {
     private int _roundUnit = 1;
     private int _leftUnit = 0;
 
+    private bool _isPlayingRound = false;
 
-    public int leftPro
+    public float leftPro
     {
         get
         {
-            return 100 - (int)((float)_leftUnit / (float)_roundUnit * 100f);
+            return 1 - (float)_leftUnit / (float)_roundUnit;
         }
     }
     public int leftUnit
@@ -45,6 +46,14 @@ public class RoundManager : MonoBehaviour {
         get
         {
             return _leftUnit;
+        }
+    }
+
+    public bool isPlayingRound
+    {
+        get
+        {
+            return _isPlayingRound;
         }
     }
 
@@ -77,6 +86,8 @@ public class RoundManager : MonoBehaviour {
 
         yield return new WaitForSeconds(3f);
 
+        _isPlayingRound = true;
+
         TextManager.instance.ViewRound();
 
         _roundUnit = 0;
@@ -97,6 +108,8 @@ public class RoundManager : MonoBehaviour {
         {
             yield return StartCoroutine(Wave(round.wave[i]));
         }
+
+        _isPlayingRound = false;
 
         EnemyManager.instance.ClearEnemy();
     }
@@ -130,6 +143,7 @@ public class RoundManager : MonoBehaviour {
     {
         _leftUnit--;
         TextManager.instance.ViewLeftUnit();
+        StartCoroutine(ViewManager.instance.MoveProgress());
         if (_leftUnit == 0) StartCoroutine(RoundClear());
     }
 

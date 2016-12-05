@@ -33,10 +33,54 @@ public class Enemy : MonoBehaviour {
 
     private int _gold;
 
+    private Vector3 _startPos = Vector3.zero;
+
     private MoveEnemy _move;
 	private Rigidbody _rigidbody;
 	private RigidbodyConstraints _rigidbodyBaseConstraints;
 	private State _state;
+
+    public bool isDeath
+    {
+        get
+        {
+            return _state == State.Idle;
+        }
+    }
+
+    public float maxHp
+    {
+        get
+        {
+            return _maxHp;
+        }
+    }
+
+    public float nowHp
+    {
+        get
+        {
+            return _nowHp;
+        }
+    }
+
+    public string name
+    {
+        get
+        {
+            return _name;
+        }
+    }
+
+    public float leftDis
+    {
+        get
+        {
+            float max = _startPos.x * _startPos.x + _startPos.z * _startPos.z;
+            float now = transform.position.x * transform.position.x + transform.position.z * transform.position.z;
+            return now / max;
+        }
+    }
 
     void Awake()
     {
@@ -57,13 +101,16 @@ public class Enemy : MonoBehaviour {
     public void Spawn(Vector3 spawnPoint, Transform targetPoint, Wave wave)
     {
 		transform.position = spawnPoint;
+        _startPos = spawnPoint;
 		_move.SetTarget(targetPoint);
+
         _ability = wave.ability;
         _maxHp = _nowHp = wave.hp;
         _moveSpeed = wave.moveSpeed;
         _attackPower = wave.attackPower;
         _attackSpeed = wave.attackSpeed;
         _gold = wave.gold;
+
 		_rigidbody.constraints = _rigidbodyBaseConstraints;
 
         MixAbility(wave.ability, wave.name);
@@ -82,23 +129,23 @@ public class Enemy : MonoBehaviour {
                 _name =  name;
                 break;
             case EnmeyAbility.Fast:
-                _name = "[빠른] " + name;
+                _name = "빠른 " + name;
                 _moveSpeed *= 1.5f;
                 _gold *= 2;
                 break;
             case EnmeyAbility.Slow:
-                _name = "[느린] " + name;
+                _name = "느린 " + name;
                 _moveSpeed *= 0.5f;
                 _attackPower *= 2f;
                 break;
             case EnmeyAbility.Strong:
-                _name = "[튼튼] " + name;
+                _name = "튼튼 " + name;
                 _maxHp *= 3f;
                 _nowHp = _maxHp;
                 _gold *= 2;
                 break;
             case EnmeyAbility.Super:
-                _name = "[슈퍼] " + name;
+                _name = "슈퍼 " + name;
                 _maxHp *= 50f;
                 _nowHp = _maxHp;
                 _gold *= 30;
@@ -124,7 +171,7 @@ public class Enemy : MonoBehaviour {
 	public void Damage(int amount) {
 		_nowHp = Mathf.Max(_nowHp - amount, 0);
 
-		HealthBar.instance.ViewEnemyBar(_maxHp, _nowHp, amount, _name, transform.name);
+		HealthBar.instance.ViewEnemyBar(this, amount);
 
 		if (_nowHp <= 0) {
 			Death();
