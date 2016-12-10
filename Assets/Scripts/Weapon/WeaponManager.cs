@@ -64,13 +64,9 @@ public class WeaponManager : MonoBehaviourC {
 		Vector3 targetPos;
 
 		if (Physics.Raycast(ray, out rayHit, 30f) && rayHit.transform.tag == "Enemy") {
-			targetPos = rayHit.transform.position;
-			if (rayHit.collider is BoxCollider) {
-				targetPos += ((BoxCollider)rayHit.collider).center;
-			}
-		}
-		else {
-			targetPos = weaponModel.transform.position + ray.GetPoint(15);
+			targetPos = ray.GetPoint(rayHit.distance);
+		} else {
+			targetPos = ray.GetPoint(15);
 		}
 
 		weaponModel.SetAngleTarget(targetPos);

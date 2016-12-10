@@ -6,14 +6,16 @@ public class LandMineData {
 	[Header("Base")]
 	public string name;
 	public int buildCost;
+	public int duration;
 	public LandMine landMine;
 
 	[Header("Attack")]
 	public int damage;
 	public float delay;
 
+	[SerializeField]
 	[Header("Upgrade")]
-	public LandMineUpgrade[] upgradeData;
+	private LandMineUpgrade[] upgradeData;
 
 	private int _upgradeUnit = 0;
 
@@ -24,6 +26,8 @@ public class LandMineData {
 		this.damage = data.damage;
 		this.delay = data.delay;
 
+		this.duration = data.duration;
+
 		this.upgradeData = data.upgradeData;
 
 		this.landMine = landMine;
@@ -31,17 +35,34 @@ public class LandMineData {
 		this.landMine.Init(this);
 	}
 
-	private bool HasNextUpgrade() {
-		return _upgradeUnit < upgradeData.Length;
+	public bool HasNextUpgrade() {
+		return (_upgradeUnit < upgradeData.Length);
 	}
 
-	public void Upgrade() { 
+	public LandMineUpgrade GetNextUpgrade() {
+		if (HasNextUpgrade()) {
+			return upgradeData[_upgradeUnit];
+		} else { 
+			return null; 
+		}
+	}
+
+	public void Upgrade() {
+		LandMineUpgrade upgrade = GetNextUpgrade();
+		damage = upgrade.damage;
+		delay = upgrade.delay;
+		_upgradeUnit++;
+
+		landMine.Init(this);
+	}
+
+	public void Downgrade() { 
 		
 	}
 }
 
 [System.Serializable]
-public struct LandMineUpgrade {
+public class LandMineUpgrade {
 	[Header("Cost")]
 	public int cost;
 
@@ -125,7 +146,7 @@ public class LandMineManager : MonoBehaviourC {
 		#region grid initialize
 		Vector3 mapCenter = map.position;
 		//float locY = transform.position.y;
-		for (int z = 0; z < gridUnit; z++) { 
+		for (int z = 0; z < gridUnit; z++) {
 			for (int x = 0; x < gridUnit; x++) {
 				Vector3 loc = mapCenter;
 				loc.x = (x - gridUnit / 2) * _gridSize;
@@ -178,7 +199,7 @@ public class LandMineManager : MonoBehaviourC {
 		Color selectorColor;
 
 		_selectedPoint = point;
-		if (_mountLandMineDataArray[point.x, point.z] != null) {
+		if (GetLandMine(point) != null) {
 			// landMine Select
 			selectorColor = Color.blue;
 			ViewManager.instance.SelectedMine();
@@ -199,9 +220,17 @@ public class LandMineManager : MonoBehaviourC {
 		gridSelector.gameObject.SetActive(true);
 	}
 
+	private LandMineData GetLandMine(SelectPoint point) {
+		return _mountLandMineDataArray[point.x, point.z];
+	}
+
+	private void SetLandMine(SelectPoint point, LandMineData landMineData) {
+		_mountLandMineDataArray[point.x, point.z] = landMineData;
+	}
+
 	private LandMineData RemoveMount(SelectPoint point) { 
-		LandMineData removeMount = _mountLandMineDataArray[point.x, point.z];
-		_mountLandMineDataArray[point.x, point.z] = null;
+		LandMineData removeMount = GetLandMine(point);
+		SetLandMine(point, null);
 		Destroy(removeMount.landMine.gameObject);
 
 		return removeMount;
@@ -221,7 +250,7 @@ public class LandMineManager : MonoBehaviourC {
 		landMine.transform.localScale = landMine.transform.localScale * _gridSize;
 
 		//RoundManager.instance.
-		_mountLandMineDataArray[_selectedPoint.x, _selectedPoint.z] = mountLandMineData;
+		SetLandMine(_selectedPoint, mountLandMineData);
 
 		gridSelector.gameObject.SetActive(false);
 
@@ -252,6 +281,19 @@ public class LandMineManager : MonoBehaviourC {
 		_selectedPoint = noneSelectPoint;
 		gridSelector.gameObject.SetActive(false);
 		ViewManager.instance.LeaveUndo();
+	}
+
+	public void ButtonUpgrade() { 
+		if (_selectedPoint.Equals(noneSelectPoint)) {
+			return;
+		}
+
+		LandMineData landMineData = GetLandMine(_selectedPoint);
+		if (!landMineData.HasNextUpgrade() || !GameManager.instance.SpendMoney(landMineData.GetNextUpgrade().cost)) {
+			return;
+		}
+
+		landMineData.Upgrade();
 	}
 	#endregion
 		
