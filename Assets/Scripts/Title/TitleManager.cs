@@ -1,7 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+
+public enum GameMode{
+    Tutorial,
+    Easy,
+    Normal,
+    Hard,
+    Crazy,
+}
 
 public class TitleManager : MonoBehaviourC {
 
@@ -10,20 +17,19 @@ public class TitleManager : MonoBehaviourC {
     public Canvas fade;
     private CanvasGroup titleGroup;
     private CanvasGroup menuGroup;
-    private CanvasGroup fadeGroup;
 
-    private bool isTitle = true;
-    private bool isMenu = false;
+    public static bool isTitle = true;
+    public static bool isMenu = false;
 
 	void Awake()
     {
         titleGroup = title.GetComponent<CanvasGroup>();
         menuGroup = menu.GetComponent<CanvasGroup>();
-        fadeGroup = fade.GetComponent<CanvasGroup>();
     }
 
     void Start()
     {
+        FirstGame();
         Init();
     }
 
@@ -32,11 +38,33 @@ public class TitleManager : MonoBehaviourC {
         WaitTouch();
     }
 
+    private void FirstGame()
+    {
+        if (!PlayerPrefs.HasKey("PLAY_TIME"))
+        {
+            Debug.Log("First Running");
+            PlayerPrefs.SetInt("PLAY_TIME", 0);
+            PlayerPrefs.SetInt("EXP", 0);
+        }
+    }
+
     private void Init()
     {
-        titleGroup.alpha = 1;
-        menuGroup.alpha = 0;
-        fadeGroup.alpha = 0;
+        if (isTitle)
+        {
+            titleGroup.alpha = 1;
+            menuGroup.alpha = 0;
+            title.gameObject.SetActive(true);
+            menu.gameObject.SetActive(false);
+        }
+        else if(!isTitle)
+        {
+            titleGroup.alpha = 0;
+            menuGroup.alpha = 1;
+            title.gameObject.SetActive(false);
+            menu.gameObject.SetActive(true);
+            StartCoroutine(ScreenManager.instance.FadeOut());
+        }
     }
 
     private void WaitTouch()
@@ -67,19 +95,10 @@ public class TitleManager : MonoBehaviourC {
 
     public void StartGame()
     {
-        if (!isMenu) return; 
-        StartCoroutine(FadeIn("Test Nyyynyyy"));
-    }
+        if (!isMenu) return;
 
-    private IEnumerator FadeIn(string scene)
-    {
-        isMenu = false;
-        fade.gameObject.SetActive(true);
-        while(fadeGroup.alpha < 1)
-        {
-            fadeGroup.alpha += 0.02f;
-            yield return null;
-        }
-        SceneManager.LoadScene(scene);
+        PlayerPrefs.SetString("GAME_MODE", GameMode.Tutorial.ToString());
+        StartCoroutine(ScreenManager.instance.FadeIn("Test Nyyynyyy"));
+        isMenu = true;
     }
 }

@@ -36,15 +36,15 @@ public class SelectMenu : MonoBehaviour {
     {
         isMoving = true;
 
-        float disLine = (posLine[(int)menu] - posLine[(int)selectedMenu]) / 20f;
-        float disMenu = (posMenu[(int)menu] - posMenu[(int)selectedMenu]) / 20f;
-        float disBack = ((int)menu - (int)selectedMenu) * 640 / 20f;
+        float disLine = (posLine[(int)menu] - posLine[(int)selectedMenu]) / 10f;
+        float disMenu = (posMenu[(int)menu] - posMenu[(int)selectedMenu]) / 10f;
+        float disBack = ((int)menu - (int)selectedMenu) * 640 / 10f;
         while (selectedLine.transform.localPosition.x != posLine[(int)menu])
         {
             selectedLine.transform.localPosition += new Vector3(disLine, 0);
             areasMenu.transform.localPosition -= new Vector3(disMenu, 0);
             background.transform.localPosition -= new Vector3(disBack, 0);
-            yield return new WaitForFixedUpdate();
+            yield return new WaitForSeconds(0.01f);
         }
         rendMenuText(menu);
         selectedMenu = menu;

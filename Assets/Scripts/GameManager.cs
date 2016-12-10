@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour {
     [Header("Game State")]
     [SerializeField] private int _round = 1;
     [SerializeField] private int _money = 0;
+    [SerializeField] private int _exp = 0;
     [SerializeField] private bool _gamePaues = false;
 
     [Header("Player State")]
@@ -17,6 +18,13 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private float _power = 1f;
 
     private bool _isGame = false;
+
+    enum Result
+    {
+        Clear,
+        Give,
+        Death,
+    }
 
     public int money
     {
@@ -77,6 +85,7 @@ public class GameManager : MonoBehaviour {
     public void TakeMoney(int cost)
     {
         _money += cost;
+        _exp += cost; // 마인 설치 시 문제
         TextManager.instance.ViewGold();
     }
 
@@ -132,5 +141,20 @@ public class GameManager : MonoBehaviour {
     {
         Time.timeScale = 1;
         _gamePaues = false;
+    }
+
+    public void GiveGame()
+    {
+        ResumeGame();
+        Gameover(Result.Give);
+        StartCoroutine(ScreenManager.instance.FadeIn("Game over"));
+    }
+
+    private void Gameover(Result result) {
+        PlayerPrefs.SetString("GAME_RESULT", result.ToString());
+        PlayerPrefs.SetInt("GAME_EXP", _exp);
+        PlayerPrefs.SetString("GAME_TIME", "6:5");
+        PlayerPrefs.Save();
+        StopAllCoroutines();
     }
 }

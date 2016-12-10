@@ -89,6 +89,7 @@ public class RoundManager : MonoBehaviour {
         _isPlayingRound = true;
 
         TextManager.instance.ViewRound();
+        StartCoroutine(ViewManager.instance.MoveProgress());
 
         _roundUnit = 0;
 

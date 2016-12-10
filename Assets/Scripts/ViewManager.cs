@@ -12,6 +12,16 @@ public enum ViewType
     MINE,
 }
 
+public enum MineState
+{
+    UnSelected,
+    JustSet,
+    SelectedFullDurability,
+    Selected,
+    FullUpgradeFullDurability,
+    FullUpgrade,
+}
+
 public class ViewManager : MonoBehaviourC {
 
     public static ViewManager instance;
@@ -44,6 +54,7 @@ public class ViewManager : MonoBehaviourC {
     public GameObject _mineRemove;
     public GameObject _mineUpgrade;
     public GameObject _mineAdd;
+    public GameObject _mineRepair;
 
     [Header("Background")]
     public Image _background;
@@ -63,8 +74,6 @@ public class ViewManager : MonoBehaviourC {
     private float _arrow;
 
     private ViewType _viewMode = ViewType.FPS;
-
-    private CanvasGroup _fadeGroup;
 
     private Blur[] _blurs;
     private Blur _blur;
@@ -103,8 +112,6 @@ public class ViewManager : MonoBehaviourC {
         }
         instance = this;
 
-        _fadeGroup = _fade.GetComponent<CanvasGroup>();
-
         _blurs = _cam.GetComponents<Blur>();
         _blur = _blurs[0];
         _superBlur = _blurs[1];
@@ -113,7 +120,7 @@ public class ViewManager : MonoBehaviourC {
     void Start () {
         Debug.Log("VIEW MANAGER IS READY");
 
-        StartCoroutine(FadeOut());
+        StartCoroutine(ScreenManager.instance.FadeOut());
 
         Init();
 
@@ -265,39 +272,57 @@ public class ViewManager : MonoBehaviourC {
             _leftUnit.rectTransform.sizeDelta = new Vector2(barWeight, BAR_H);
             yield return null;
         }
+        _leftUnit.rectTransform.sizeDelta = new Vector2(RoundManager.instance.leftPro * BAR_W, BAR_H);
     } 
     #endregion
 
     #region Mine
-    public void Unselected()
+    public void SetMineBtn(MineState state)
     {
-        _mineAdd.SetActive(false);
-        _mineUpgrade.SetActive(false);
-        _mineRemove.SetActive(false);
-    }
-
-    public void SelectedMine()
-    {
-        _mineAdd.SetActive(false);
-        _mineUpgrade.SetActive(true);
-        _mineRemove.SetActive(true);
-    }
-
-    public void SelectedGrid()
-    {
-        _mineAdd.SetActive(true);
-        _mineUpgrade.SetActive(false);
-        _mineRemove.SetActive(false);
-    }
-
-    public void ChanceUndo()
-    {
-        _mineUndo.SetActive(true);
-    }
-
-    public void LeaveUndo()
-    {
-        _mineUndo.SetActive(false);
+        switch (state) {
+            case MineState.UnSelected:
+                _mineAdd.SetActive(true);
+                _mineUpgrade.SetActive(false);
+                _mineRemove.SetActive(false);
+                _mineRepair.SetActive(false);
+                _mineUndo.SetActive(false);
+                return;
+            case MineState.JustSet:
+                _mineAdd.SetActive(false);
+                _mineUpgrade.SetActive(true);
+                _mineRemove.SetActive(false);
+                _mineRepair.SetActive(false);
+                _mineUndo.SetActive(true);
+                return;
+            case MineState.SelectedFullDurability:
+                _mineAdd.SetActive(false);
+                _mineUpgrade.SetActive(true);
+                _mineRemove.SetActive(true);
+                _mineRepair.SetActive(false);
+                _mineUndo.SetActive(false);
+                return;
+            case MineState.Selected:
+                _mineAdd.SetActive(false);
+                _mineUpgrade.SetActive(true);
+                _mineRemove.SetActive(true);
+                _mineRepair.SetActive(true);
+                _mineUndo.SetActive(false);
+                return;
+            case MineState.FullUpgrade:
+                _mineAdd.SetActive(false);
+                _mineUpgrade.SetActive(false);
+                _mineRemove.SetActive(true);
+                _mineRepair.SetActive(true);
+                _mineUndo.SetActive(false);
+                return;
+            case MineState.FullUpgradeFullDurability:
+                _mineAdd.SetActive(false);
+                _mineUpgrade.SetActive(false);
+                _mineRemove.SetActive(true);
+                _mineRepair.SetActive(false);
+                _mineUndo.SetActive(false);
+                return;
+        }
     }
     #endregion
 
@@ -365,17 +390,7 @@ public class ViewManager : MonoBehaviourC {
         }
         _superBlur.enabled = false;
     }
-
-    private IEnumerator FadeOut()
-    {
-        _fade.gameObject.SetActive(true);
-        while (_fadeGroup.alpha > 0)
-        {
-            _fadeGroup.alpha -= 0.01f;
-            yield return null;
-        }
-        _fade.gameObject.SetActive(false);
-    }
+    
 #endregion
 
     #region TouchUI
