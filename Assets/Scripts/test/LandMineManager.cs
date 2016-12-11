@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-#region Land Mine struct serializable
+#region Land Mine class serializable
 [System.Serializable]
 public class LandMineData {
 	[Header("Base")]
@@ -35,6 +35,16 @@ public class LandMineData {
 		this.landMine.Init(this);
 	}
 
+	public MineState mineState { 
+		get {
+			if (landMine.CanRepair(this)) {
+				return HasNextUpgrade() ? MineState.Selected: MineState.FullUpgrade;
+			} else {
+				return HasNextUpgrade() ? MineState.SelectedFullDurability: MineState.FullUpgradeFullDurability;
+			}
+		}
+	}
+
 	public bool HasNextUpgrade() {
 		return (_upgradeUnit < upgradeData.Length);
 	}
@@ -56,8 +66,16 @@ public class LandMineData {
 		landMine.Init(this);
 	}
 
-	public void Downgrade() { 
-		
+	public void Downgrade() {
+		if (_upgradeUnit == 0) {
+			return;
+		}
+
+		LandMineUpgrade downgrade = upgradeData[--_upgradeUnit];
+		damage = downgrade.damage;
+		delay = downgrade.delay;
+
+		landMine.Init(this);
 	}
 }
 
@@ -82,6 +100,32 @@ public class LandMineManager : MonoBehaviourC {
 		}
 	}
 
+	#region Undo
+	private struct UndoData {
+		public readonly UndoType type;
+		public readonly LandMineData data;
+		public readonly SelectPoint point;
+
+		public UndoData(LandMineData upgrade, SelectPoint point) {
+			this.type = UndoType.Upgrade;
+			this.data = upgrade;
+			this.point = point;
+		}
+
+		public UndoData(SelectPoint point) {
+			this.type = UndoType.Mount;
+			this.data = null;
+			this.point = point;
+		}
+	}
+
+	private enum UndoType {
+		Mount,
+		Upgrade
+	}
+	#endregion
+
+	#region variable
 	[Header("Map")]
 	public Transform map;
 
@@ -113,10 +157,13 @@ public class LandMineManager : MonoBehaviourC {
 
 	// current selected LandMineData
 	private LandMineData _currentLandMine;
+	// undo data
+	private UndoData _undoData;
 
 	// select point relation variable
 	private SelectPoint _selectedPoint;
 	private readonly SelectPoint noneSelectPoint = new SelectPoint(-1, -1);
+	#endregion
 
 	void Start () {
 		if (map.lossyScale.x - map.lossyScale.z > 0f) {
@@ -199,21 +246,20 @@ public class LandMineManager : MonoBehaviourC {
 		Color selectorColor;
 
 		_selectedPoint = point;
-		if (GetLandMine(point) != null) {
+		LandMineData selectLandMine;
+		if ((selectLandMine = GetLandMine(point)) != null) {
 			// landMine Select
 			selectorColor = Color.blue;
-			ViewManager.instance.SelectedMine();
-		} else if (GameManager.instance.money >= 50) {
+			ViewManager.instance.SetMineBtn(selectLandMine.mineState);
+		} else if (GameManager.instance.money >= _currentLandMine.buildCost) {
 			// grid Select
 			selectorColor = Color.green;
-			ViewManager.instance.SelectedGrid();
+			ViewManager.instance.SetMineBtn(MineState.UnSelected);
 		} else {
 			// no money
 			_selectedPoint = noneSelectPoint;
 			selectorColor = Color.red;
 		}
-
-		ViewManager.instance.LeaveUndo();
 
 		gridSelector.position = _gridSelectorLoc;
 		gridSelector.GetComponent<MeshRenderer>().material.color = selectorColor;
@@ -236,6 +282,21 @@ public class LandMineManager : MonoBehaviourC {
 		return removeMount;
 	}
 
+	private void Undo() {
+		if (_undoData.type == UndoType.Mount) {
+			GameManager.instance.TakeMoney(RemoveMount(_undoData.point).buildCost);
+		} else {
+			_undoData.data.Downgrade();
+		}
+
+		ResetSelector(_selectedPoint);
+	}
+
+	private void UpdateUndoData(UndoData undoData) {
+		_undoData = undoData;
+		ViewManager.instance.SetMineBtn(MineState.JustSet);
+	}
+
 	#region button
 	public void ButtonMount() {
 		if (_selectedPoint.Equals(noneSelectPoint) || !GameManager.instance.SpendMoney(_currentLandMine.buildCost)) {
@@ -254,17 +315,11 @@ public class LandMineManager : MonoBehaviourC {
 
 		gridSelector.gameObject.SetActive(false);
 
-		ViewManager.instance.ChanceUndo();
+		UpdateUndoData(new UndoData(_selectedPoint));
 	}
 
-	public void ButtonUndoMount() {
-		if (_selectedPoint.Equals(noneSelectPoint)) {
-			return;
-		}
-
-		GameManager.instance.TakeMoney(RemoveMount(_selectedPoint).buildCost);
-
-		ResetSelector(_selectedPoint);
+	public void ButtonUndo() {
+		Undo();
 	}
 
 	public void ButtonRemove() { 
@@ -280,7 +335,7 @@ public class LandMineManager : MonoBehaviourC {
 	public void ButtonCancle() {
 		_selectedPoint = noneSelectPoint;
 		gridSelector.gameObject.SetActive(false);
-		ViewManager.instance.LeaveUndo();
+		//ViewManager.instance.LeaveUndo();
 	}
 
 	public void ButtonUpgrade() { 
@@ -294,9 +349,10 @@ public class LandMineManager : MonoBehaviourC {
 		}
 
 		landMineData.Upgrade();
+		UpdateUndoData(new UndoData(landMineData, _selectedPoint));
 	}
 	#endregion
-		
+
 	#region center check function
 	private bool IsCenterLoc(SelectPoint point) {
 		return IsCenter(point.x, gridUnit, centerLange) && IsCenter(point.z, gridUnit, centerLange);

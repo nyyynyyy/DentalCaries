@@ -252,7 +252,7 @@ public class ViewManager : MonoBehaviourC {
         _mine.gameObject.SetActive(true);
         _viewChangeBtn.gameObject.SetActive(false);
 
-        Unselected();
+        //Unselected();
 
         _blur.enabled = false;
 
@@ -289,7 +289,7 @@ public class ViewManager : MonoBehaviourC {
                 return;
             case MineState.JustSet:
                 _mineAdd.SetActive(false);
-                _mineUpgrade.SetActive(true);
+                _mineUpgrade.SetActive(false);
                 _mineRemove.SetActive(false);
                 _mineRepair.SetActive(false);
                 _mineUndo.SetActive(true);

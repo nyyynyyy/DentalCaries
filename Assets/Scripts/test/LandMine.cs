@@ -18,14 +18,18 @@ public class LandMine : MonoBehaviour {
 	}
 
 	public void Repair(LandMineData data) {
-		if (!IsDeath()) {
+		if (!CanRepair(data)) {
 			return;
 		}
 
 		_duration = data.duration;
 	}
 
-	public bool IsDeath() {
+	public bool CanRepair(LandMineData data) {
+		return data.duration > _duration;
+	}
+
+	private bool IsDeath() {
 		return _duration <= 0;
 	}
 
