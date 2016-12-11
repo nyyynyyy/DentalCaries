@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum GameMode{
     Tutorial,
@@ -14,14 +15,19 @@ public class TitleManager : MonoBehaviourC {
 
     public Canvas title;
     public Canvas menu;
-    public Canvas fade;
     private CanvasGroup titleGroup;
     private CanvasGroup menuGroup;
 
     public static bool isTitle = true;
     public static bool isMenu = false;
 
-	void Awake()
+    [Header ("Temp Button")]
+    public Text btnNyyynyyy;
+    public Text btnINSI;
+
+    private string targetScene = "Test Nyyynyyy";
+
+    void Awake()
     {
         titleGroup = title.GetComponent<CanvasGroup>();
         menuGroup = menu.GetComponent<CanvasGroup>();
@@ -98,7 +104,23 @@ public class TitleManager : MonoBehaviourC {
         if (!isMenu) return;
 
         PlayerPrefs.SetString("GAME_MODE", GameMode.Tutorial.ToString());
-        StartCoroutine(ScreenManager.instance.FadeIn("Test Nyyynyyy"));
+        StartCoroutine(ScreenManager.instance.FadeIn(targetScene));
         isMenu = true;
     }
+
+    #region Temp Method
+    public void ButtonNyyynyyy()
+    {
+        btnINSI.color = new Color(133 / 255f, 133 / 255f, 133 / 255f);
+        btnNyyynyyy.color = new Color(255 / 255, 255 / 255, 255 / 255);
+        targetScene = "Test Nyyynyyy";
+    }
+
+    public void ButtonINSI()
+    {
+        btnNyyynyyy.color = new Color(133 / 255f, 133 / 255f, 133 / 255f);
+        btnINSI.color = new Color(255 / 255, 255 / 255, 255 / 255);
+        targetScene = "Test INSI";
+    }
+    #endregion
 }
