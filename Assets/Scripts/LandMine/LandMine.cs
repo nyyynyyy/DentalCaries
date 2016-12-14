@@ -92,7 +92,7 @@ public class LandMine : MonoBehaviour
 	private int _maxDurability;
 	private int _durability;
 
-	private LandMineDurabilitySlider _durabilitySlider;
+	//private LandMineDurabilitySlider _durabilitySlider;
 
 	public AttackInfo attackInfo 
 	{
@@ -103,6 +103,9 @@ public class LandMine : MonoBehaviour
 	{
 		get { return _upgradeInfo; }
 	}
+
+	public int maxDurability { get { return _maxDurability; } }
+	public int durability { get { return _durability; } }
 
 	public MineState mineState
 	{
@@ -119,7 +122,7 @@ public class LandMine : MonoBehaviour
 		}
 	}
 
-	public void Init(LandMineData data, LandMineDurabilitySlider originalSlider)
+	public void Init(LandMineData data)
 	{
 		_attackInfo = new AttackInfo(data.damage, data.delay);
 		_upgradeInfo = new UpgradeInfo(data.upgradeData);
@@ -127,12 +130,12 @@ public class LandMine : MonoBehaviour
 		_maxDurability = data.durability;
 		_durability = _maxDurability;
 
-		_durabilitySlider = Instantiate(originalSlider);
-		_durabilitySlider.Init(_maxDurability);
+		//_durabilitySlider = Instantiate(originalSlider);
+		//_durabilitySlider.Init(_maxDurability);
 
-		Transform sliderTransform = _durabilitySlider.transform;
-		sliderTransform.SetParent(transform);
-		sliderTransform.localPosition = Vector3.up;
+		//Transform sliderTransform = _durabilitySlider.transform;
+		//sliderTransform.SetParent(transform);
+		//sliderTransform.localPosition = Vector3.up;
 	}
 
 	public void Repair()
@@ -143,7 +146,7 @@ public class LandMine : MonoBehaviour
 		}
 
 		_durability= _maxDurability;
-		_durabilitySlider.Set(_durability);
+		//_durabilitySlider.Set(_durability);
 		StartCoroutine(AlphaColor(1f, 0.8f));
 	}
 
@@ -165,7 +168,7 @@ public class LandMine : MonoBehaviour
 			Death();
 		}
 
-		_durabilitySlider.Set(_durability);
+		//_durabilitySlider.Set(_durability);
 	}
 
 	public LandMineUpgrade Upgrade()

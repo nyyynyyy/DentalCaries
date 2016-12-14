@@ -122,7 +122,7 @@ public class LandMineManager : MonoBehaviourC
 	public int _centerLange;
 
 	[Header("LandMine Data")]
-	public LandMineDurabilitySlider _durabilitySliderObject;
+	//public LandMineDurabilitySlider _durabilitySliderObject;
 	public LandMineData[] _landMines;
 
 	[Header("Selector")]
@@ -252,6 +252,15 @@ public class LandMineManager : MonoBehaviourC
 		if ((selectLandMine = GetData(point)) != null)
 		{
 			// landMine Select
+			LandMine.AttackInfo attack = selectLandMine.attackInfo;
+			ViewManager.instance.SetMineState(
+				selectLandMine.upgradeInfo.level,
+				attack.damage, 
+				attack.delay,
+				selectLandMine.maxDurability,
+				selectLandMine.durability
+			);
+
 			selectorColor = Color.blue;
 			state = selectLandMine.mineState;
 		} 
@@ -288,7 +297,7 @@ public class LandMineManager : MonoBehaviourC
 
 	private void Mount(SelectPoint point) {
 		LandMine landMine = Instantiate(_currentLandMineData.landMine);
-		landMine.Init(_currentLandMineData, _durabilitySliderObject);
+		landMine.Init(_currentLandMineData);
 
 		landMine.transform.SetParent(_landMineStorage);
 		landMine.transform.position = _gridLocArray[point.x, point.z];
