@@ -47,6 +47,7 @@ public class ViewManager : MonoBehaviourC {
 
     [Header("Mine")]
     public GameObject _mines;
+    public MineStateWindow _mineState;
     public GameObject _mineCancle;
     public GameObject _mineUndo;
     public GameObject _mineRemove;
@@ -316,6 +317,11 @@ public class ViewManager : MonoBehaviourC {
                 _mineUndo.SetActive(false);
                 return;
         }
+    }
+
+    public void SetMineState(int level, int power, float delay, int maxDurability, int nowDurability)
+    {
+        _mineState.RenderState(level, power, delay, maxDurability, nowDurability);
     }
     #endregion
 
