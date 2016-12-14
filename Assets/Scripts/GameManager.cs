@@ -2,6 +2,13 @@
 using UnityEngine.UI;
 using System.Collections;
 
+public enum GameOverType
+{
+    Clear,
+    Give,
+    Death,
+}
+
 public class GameManager : MonoBehaviour {
 
     public static GameManager instance;
@@ -19,13 +26,7 @@ public class GameManager : MonoBehaviour {
 
     private bool _isGame = false;
 
-    enum Result
-    {
-        Clear,
-        Give,
-        Death,
-    }
-
+    #region Property
     public int money
     {
         get
@@ -68,6 +69,7 @@ public class GameManager : MonoBehaviour {
             return _gamePaues;
         }
     }
+    #endregion
 
     void Awake()
     {
@@ -100,7 +102,7 @@ public class GameManager : MonoBehaviour {
     public void Damage(float damage)
     {
         _nowHealth -= damage;
-        TextManager.instance.ViewHp();
+        StartCoroutine(PlayerHpBar.instance.BarDecrease());
         if (_nowHealth <= 0) GameOver();
     }
 
@@ -146,15 +148,15 @@ public class GameManager : MonoBehaviour {
     public void GiveGame()
     {
         ResumeGame();
-        Gameover(Result.Give);
-        StartCoroutine(ScreenManager.instance.FadeIn("Game over"));
+        Gameover(GameOverType.Give);
     }
 
-    private void Gameover(Result result) {
-        PlayerPrefs.SetString("GAME_RESULT", result.ToString());
-        PlayerPrefs.SetInt("GAME_EXP", _exp);
-        PlayerPrefs.SetString("GAME_TIME", "6:5");
-        PlayerPrefs.Save();
+    private void Gameover(GameOverType result) {
+        UserManager.instance.SetUserData(GameKey.OverType, (int)result);
+        UserManager.instance.SetUserData(GameKey.Exp, _exp);
+        UserManager.instance.SetUserData(GameKey.Time, 65);
+
         StopAllCoroutines();
+        StartCoroutine(ScreenManager.instance.FadeIn("Game over"));
     }
 }

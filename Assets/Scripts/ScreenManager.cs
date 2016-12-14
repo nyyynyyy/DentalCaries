@@ -22,16 +22,6 @@ public class ScreenManager : MonoBehaviour {
         instance = this;
     }
 
-    // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
     public IEnumerator FadeIn(string scene)
     {
         if (_isFading) yield break;

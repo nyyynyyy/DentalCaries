@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum GameMode{
+public enum GameMode
+{
     Tutorial,
     Easy,
     Normal,
@@ -13,30 +14,30 @@ public enum GameMode{
 
 public class TitleManager : MonoBehaviourC {
 
-    public Canvas title;
-    public Canvas menu;
-    private CanvasGroup titleGroup;
-    private CanvasGroup menuGroup;
+    public Canvas _title;
+    public Canvas _menu;
+    private CanvasGroup _titleGroup;
+    private CanvasGroup _menuGroup;
 
-    public static bool isTitle = true;
-    public static bool isMenu = false;
+    public static bool _isTitle = true;
+    public static bool _isMenu = false;
 
     [Header ("Temp Button")]
-    public Text btnNyyynyyy;
-    public Text btnINSI;
+    public Text _btnNyyynyyy;
+    public Text _btnINSI;
 
-    private string targetScene = "Test Nyyynyyy";
+    private string _targetScene = "Test Nyyynyyy";
 
     void Awake()
     {
-        titleGroup = title.GetComponent<CanvasGroup>();
-        menuGroup = menu.GetComponent<CanvasGroup>();
+        _titleGroup = _title.GetComponent<CanvasGroup>();
+        _menuGroup = _menu.GetComponent<CanvasGroup>();
     }
 
     void Start()
     {
-        FirstGame();
         Init();
+        Time.timeScale = 1f;
     }
 
     void Update()
@@ -44,31 +45,21 @@ public class TitleManager : MonoBehaviourC {
         WaitTouch();
     }
 
-    private void FirstGame()
-    {
-        if (!PlayerPrefs.HasKey("PLAY_TIME"))
-        {
-            Debug.Log("First Running");
-            PlayerPrefs.SetInt("PLAY_TIME", 0);
-            PlayerPrefs.SetInt("EXP", 0);
-        }
-    }
-
     private void Init()
     {
-        if (isTitle)
+        if (_isTitle)
         {
-            titleGroup.alpha = 1;
-            menuGroup.alpha = 0;
-            title.gameObject.SetActive(true);
-            menu.gameObject.SetActive(false);
+            _titleGroup.alpha = 1;
+            _menuGroup.alpha = 0;
+            _title.gameObject.SetActive(true);
+            _menu.gameObject.SetActive(false);
         }
-        else if(!isTitle)
+        else if(!_isTitle)
         {
-            titleGroup.alpha = 0;
-            menuGroup.alpha = 1;
-            title.gameObject.SetActive(false);
-            menu.gameObject.SetActive(true);
+            _titleGroup.alpha = 0;
+            _menuGroup.alpha = 1;
+            _title.gameObject.SetActive(false);
+            _menu.gameObject.SetActive(true);
             StartCoroutine(ScreenManager.instance.FadeOut());
         }
     }
@@ -83,44 +74,49 @@ public class TitleManager : MonoBehaviourC {
 
     private IEnumerator ChangeAnim()
     {
-        isTitle = false;
-        while(titleGroup.alpha > 0)
+        _isTitle = false;
+        while(_titleGroup.alpha > 0)
         {
-            titleGroup.alpha -= 0.05f;
+            _titleGroup.alpha -= 0.05f;
             yield return new WaitForSeconds(0.1f);
         }
-        title.gameObject.SetActive(false);
-        menu.gameObject.SetActive(true);
-        while(menuGroup.alpha < 1)
+        _title.gameObject.SetActive(false);
+        _menu.gameObject.SetActive(true);
+        while(_menuGroup.alpha < 1)
         {
-            menuGroup.alpha += 0.05f;
+            _menuGroup.alpha += 0.05f;
             yield return new WaitForSeconds(0.1f);
         }
-        isMenu = true;
+        _isMenu = true;
     }
 
     public void StartGame()
     {
-        if (!isMenu) return;
+        if (!_isMenu) return;
 
-        PlayerPrefs.SetString("GAME_MODE", GameMode.Tutorial.ToString());
-        StartCoroutine(ScreenManager.instance.FadeIn(targetScene));
-        isMenu = true;
+        UserManager.instance.SetUserData(GameKey.Mode, (int)GameMode.Tutorial);
+        StartCoroutine(ScreenManager.instance.FadeIn(_targetScene));
+        _isMenu = true;
     }
 
     #region Temp Method
     public void ButtonNyyynyyy()
     {
-        btnINSI.color = new Color(133 / 255f, 133 / 255f, 133 / 255f);
-        btnNyyynyyy.color = new Color(255 / 255, 255 / 255, 255 / 255);
-        targetScene = "Test Nyyynyyy";
+        _btnINSI.color = new Color(133 / 255f, 133 / 255f, 133 / 255f);
+        _btnNyyynyyy.color = new Color(255 / 255, 255 / 255, 255 / 255);
+        _targetScene = "Test Nyyynyyy";
     }
 
     public void ButtonINSI()
     {
-        btnNyyynyyy.color = new Color(133 / 255f, 133 / 255f, 133 / 255f);
-        btnINSI.color = new Color(255 / 255, 255 / 255, 255 / 255);
-        targetScene = "Test INSI";
+        _btnNyyynyyy.color = new Color(133 / 255f, 133 / 255f, 133 / 255f);
+        _btnINSI.color = new Color(255 / 255, 255 / 255, 255 / 255);
+        _targetScene = "Test INSI";
+    }
+
+    public void ButtonClear()
+    {
+        UserManager.instance.ClearUserData(true);
     }
     #endregion
 }

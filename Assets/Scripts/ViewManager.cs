@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿#define TEST
+
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.EventSystems;
@@ -32,9 +34,6 @@ public class ViewManager : MonoBehaviourC {
     public GameObject _weapon;
     public GameObject _player;
     public float _rotateSpeed;
-
-    [Header("Header")]
-    public Image _leftUnit;
 
     [Header("Shop")]
     public Shop _shop;
@@ -119,9 +118,9 @@ public class ViewManager : MonoBehaviourC {
 
     void Start () {
         Debug.Log("VIEW MANAGER IS READY");
-
+#if !TEST
         StartCoroutine(ScreenManager.instance.FadeOut());
-
+#endif
         Init();
 
 #if UNITY_EDITOR
@@ -137,7 +136,6 @@ public class ViewManager : MonoBehaviourC {
     private void Init()
     {
         _arrow = _fps.rotation.eulerAngles.y;
-        _leftUnit.rectTransform.sizeDelta = new Vector2(0, BAR_H);
         ChangeViewFps();
     }
 
@@ -261,19 +259,6 @@ public class ViewManager : MonoBehaviourC {
 
         _viewMode = ViewType.MINE;
     }
-    #endregion
-
-    #region Header
-    public IEnumerator MoveProgress()
-    {
-        while (RoundManager.instance.leftPro * BAR_W > _leftUnit.rectTransform.sizeDelta.x)
-        {
-            float barWeight = Mathf.Min(_leftUnit.rectTransform.sizeDelta.x + UP_BAR, BAR_W);
-            _leftUnit.rectTransform.sizeDelta = new Vector2(barWeight, BAR_H);
-            yield return null;
-        }
-        _leftUnit.rectTransform.sizeDelta = new Vector2(RoundManager.instance.leftPro * BAR_W, BAR_H);
-    } 
     #endregion
 
     #region Mine

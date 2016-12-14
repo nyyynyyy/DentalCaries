@@ -7,40 +7,62 @@ public class GameoverManager : MonoBehaviourC {
 
     public Text _result;
 
-    private string _time;
+    public ExpBar _bar;
+
+    private int _time;
     private int _gameExp;
     private int _userExp;
-    private string _gameResult;
-    private string _gameMode;
+    private int _userLevel;
+    private int _userTicket;
+    private int _gameOver;
+    private int _gameMode;
 
-	// Use this for initialization
-	void Start () {
+	void Start ()
+    {
         StartCoroutine(ScreenManager.instance.FadeOut());
         GetData();
+        TakeExp();
         SetText();
+
+        StartCoroutine(_bar.BarDecrease(_gameExp));
     }
 	
-	// Update is called once per frame
-	void Update () {
+	void Update ()
+    {
         WaitTouch();
 	}
 
     private void GetData()
     {
-        _time = PlayerPrefs.GetString("GAME_TIME");
-        PlayerPrefs.DeleteKey("GAME_TIME");
-        _userExp = PlayerPrefs.GetInt("EXP");
-        _gameExp = PlayerPrefs.GetInt("GAME_EXP");
-        PlayerPrefs.DeleteKey("GAME_EXP");
-        _gameMode = PlayerPrefs.GetString("GAME_MODE");
-        PlayerPrefs.DeleteKey("GAME_MODE");
-        _gameResult = PlayerPrefs.GetString("GAME_RESULT");
-        PlayerPrefs.DeleteKey("GAME_RESULT");
+        _time = UserManager.instance.GetUserData(GameKey.Time);
+
+        _userExp = UserManager.instance.GetUserData(UserKey.Exp);
+        _gameExp = UserManager.instance.GetUserData(GameKey.Exp);
+        _userLevel = UserManager.instance.GetUserData(UserKey.Level);
+        _userTicket = UserManager.instance.GetUserData(UserKey.Ticket);
+
+        _gameMode = UserManager.instance.GetUserData(GameKey.Mode);
+        _gameOver = UserManager.instance.GetUserData(GameKey.OverType);
+    }
+
+    private void TakeExp()
+    {
+        _userExp += _gameExp;
+
+        int levelUpPoint = _userExp / 1000;
+
+        _userLevel += levelUpPoint;
+        _userTicket += levelUpPoint;
+        _userExp = _userExp % 1000;
+
+        UserManager.instance.SetUserData(UserKey.Level, _userLevel);
+        UserManager.instance.SetUserData(UserKey.Exp, _userExp);
+        UserManager.instance.SetUserData(UserKey.Ticket, _userTicket);
     }
 
     private void SetText()
     {
-        _result.text = _gameMode + " " + _gameResult;
+        _result.text = ((GameMode)_gameMode).ToString() + " " + ((GameOverType)_gameOver).ToString();
     }
 
     private void WaitTouch()

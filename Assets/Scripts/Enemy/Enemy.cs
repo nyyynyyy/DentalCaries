@@ -24,7 +24,7 @@ public class Enemy : MonoBehaviour {
     private EnmeyAbility _ability;
 
     private string _name;
-    public float _moveSpeed;
+    private float _moveSpeed;
     private float _attackSpeed;
     private float _attackPower;
 
@@ -40,6 +40,7 @@ public class Enemy : MonoBehaviour {
 	private RigidbodyConstraints _rigidbodyBaseConstraints;
 	private State _state;
 
+    #region Property
     public bool isDeath
     {
         get
@@ -72,7 +73,15 @@ public class Enemy : MonoBehaviour {
         }
     }
 
-    public float leftDis
+    public float moveSpeed
+    {
+        get
+        {
+            return _moveSpeed;
+        }
+    }
+
+    public float travelDistancePer
     {
         get
         {
@@ -81,6 +90,12 @@ public class Enemy : MonoBehaviour {
             return now / max;
         }
     }
+
+    public State state
+    {
+        get { return _state; }
+    }
+    #endregion
 
     void Awake()
     {
@@ -93,10 +108,6 @@ public class Enemy : MonoBehaviour {
     {
         _type = type;
     }
-
-	public State state {
-		get { return _state; }
-	}
 
     public void Spawn(Vector3 spawnPoint, Transform targetPoint, Wave wave)
     {
@@ -171,7 +182,7 @@ public class Enemy : MonoBehaviour {
 	public void Damage(int amount) {
 		_nowHp = Mathf.Max(_nowHp - amount, 0);
 
-		HealthBar.instance.ViewEnemyBar(this, amount);
+		EnemyHpBar.instance.BarDecrease(this, amount);
 
 		if (_nowHp <= 0) {
 			Death();

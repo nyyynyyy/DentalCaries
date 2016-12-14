@@ -18,7 +18,7 @@ public class WeaponModelMove : MonoBehaviour {
 
 	private float _lastSetTargetTime = -10;
 	private float _lastRotateViewTime = -10;
-
+    
 	void Start() {
 		_directionBase = Quaternion.Euler(directionBase);
 	}

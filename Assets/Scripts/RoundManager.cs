@@ -70,8 +70,6 @@ public class RoundManager : MonoBehaviour {
         Debug.Log("ROUND MANAGER IS READY");
 
         StartCoroutine(WaitAllStart());
-
-       // TextManager.instance.ViewLeftUnit();
     }
 
     private IEnumerator WaitAllStart()
@@ -88,9 +86,6 @@ public class RoundManager : MonoBehaviour {
 
         _isPlayingRound = true;
 
-        TextManager.instance.ViewRound();
-        StartCoroutine(ViewManager.instance.MoveProgress());
-
         _roundUnit = 0;
 
         for (int i = 0; i < round.wave.Length; i++)
@@ -100,6 +95,9 @@ public class RoundManager : MonoBehaviour {
         }
 
         _leftUnit = _roundUnit;
+
+        TextManager.instance.ViewRound();
+        StartCoroutine(RoundProgressBar.instance.BarLengthen());
 
         StartCoroutine(ViewManager.instance.BlurOn());
         yield return StartCoroutine(TextManager.instance.ViewMessage(round.name));
@@ -144,7 +142,7 @@ public class RoundManager : MonoBehaviour {
     {
         _leftUnit--;
         TextManager.instance.ViewLeftUnit();
-        StartCoroutine(ViewManager.instance.MoveProgress());
+        StartCoroutine(RoundProgressBar.instance.BarLengthen());
         if (_leftUnit == 0) StartCoroutine(RoundClear());
     }
 
