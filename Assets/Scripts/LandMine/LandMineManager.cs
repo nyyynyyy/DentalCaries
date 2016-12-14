@@ -6,7 +6,7 @@ public struct LandMineData {
 	[Header("Base")]
 	public string name;
 	public int buildCost;
-	public int duration;
+	public int durability;
 
 	[Header("LandMine GameObject Prefab")]
 	public LandMine landMine;
@@ -122,7 +122,7 @@ public class LandMineManager : MonoBehaviourC
 	public int _centerLange;
 
 	[Header("LandMine Data")]
-	public LandMineDurationSlider _durationSliderObject;
+	public LandMineDurabilitySlider _durabilitySliderObject;
 	public LandMineData[] _landMines;
 
 	[Header("Selector")]
@@ -243,10 +243,11 @@ public class LandMineManager : MonoBehaviourC
 		// selector location and color setting
 		_gridSelectorLoc.x = transform.position.x + (point.x - _gridUnit / 2) * _gridSize;
 		_gridSelectorLoc.z = transform.position.z + (point.z - _gridUnit / 2) * _gridSize;
-		Color selectorColor;
-		MineState state;
 
 		_selectedPoint = point;
+
+		Color selectorColor;
+		MineState state;
 		LandMine selectLandMine;
 		if ((selectLandMine = GetData(point)) != null)
 		{
@@ -287,7 +288,7 @@ public class LandMineManager : MonoBehaviourC
 
 	private void Mount(SelectPoint point) {
 		LandMine landMine = Instantiate(_currentLandMineData.landMine);
-		landMine.Init(_currentLandMineData, _durationSliderObject);
+		landMine.Init(_currentLandMineData, _durabilitySliderObject);
 
 		landMine.transform.SetParent(_landMineStorage);
 		landMine.transform.position = _gridLocArray[point.x, point.z];

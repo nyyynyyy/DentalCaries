@@ -34,6 +34,8 @@ public class LandMine : MonoBehaviour
 
 		private LandMineUpgrade[] _upgradeData;
 
+		public int level { get { return _upgradeUnit; } }
+
 		public UpgradeInfo(LandMineUpgrade[] upgradeData) {
 			_upgradeUnit = 0;
 			_upgradeData = upgradeData;
@@ -51,14 +53,26 @@ public class LandMine : MonoBehaviour
 
 		public LandMineUpgrade MoveNext()
 		{
-			CheckError(!HasPrevious());
+			CheckError(!HasNext());
 			return _upgradeData[_upgradeUnit++];
 		}
 
 		public LandMineUpgrade MovePrevious() 
 		{
-			CheckError(!HasNext());
+			CheckError(!HasPrevious());
 			return _upgradeData[--_upgradeUnit];
+		}
+
+		public LandMineUpgrade GetNext()
+		{
+			if (HasNext())
+			{
+				return _upgradeData[_upgradeUnit];
+			}
+			else
+			{
+				return null;
+			}
 		}
 
 		private void CheckError(bool error) {
@@ -75,10 +89,10 @@ public class LandMine : MonoBehaviour
 	private AttackInfo _attackInfo;
 	private UpgradeInfo _upgradeInfo;
 
-	private int _maxDuration;
-	private int _duration;
+	private int _maxDurability;
+	private int _durability;
 
-	private LandMineDurationSlider _durationSlider;
+	private LandMineDurabilitySlider _durabilitySlider;
 
 	public AttackInfo attackInfo 
 	{
@@ -105,18 +119,18 @@ public class LandMine : MonoBehaviour
 		}
 	}
 
-	public void Init(LandMineData data, LandMineDurationSlider originalSlider)
+	public void Init(LandMineData data, LandMineDurabilitySlider originalSlider)
 	{
 		_attackInfo = new AttackInfo(data.damage, data.delay);
 		_upgradeInfo = new UpgradeInfo(data.upgradeData);
 
-		_maxDuration = data.duration;
-		_duration = _maxDuration;
+		_maxDurability = data.durability;
+		_durability = _maxDurability;
 
-		_durationSlider = Instantiate(originalSlider);
-		_durationSlider.Init(_maxDuration);
+		_durabilitySlider = Instantiate(originalSlider);
+		_durabilitySlider.Init(_maxDurability);
 
-		Transform sliderTransform = _durationSlider.transform;
+		Transform sliderTransform = _durabilitySlider.transform;
 		sliderTransform.SetParent(transform);
 		sliderTransform.localPosition = Vector3.up;
 	}
@@ -128,30 +142,30 @@ public class LandMine : MonoBehaviour
 			return;
 		}
 
-		_duration= _maxDuration;
-		_durationSlider.Set(_duration);
+		_durability= _maxDurability;
+		_durabilitySlider.Set(_durability);
 		StartCoroutine(AlphaColor(1f, 0.8f));
 	}
 
 	public bool CanRepair()
 	{
-		return _duration < _maxDuration;
+		return _durability < _maxDurability;
 	}
 
 	public bool IsDeath()
 	{
-		return _duration <= 0;
+		return _durability <= 0;
 	}
 
 	public void Attack(Enemy enemy) {
 		enemy.Damage(attackInfo.damage);
 
-		if (--_duration <= 0)
+		if (--_durability <= 0)
 		{
 			Death();
 		}
 
-		_durationSlider.Set(_duration);
+		_durabilitySlider.Set(_durability);
 	}
 
 	public LandMineUpgrade Upgrade()
@@ -172,7 +186,7 @@ public class LandMine : MonoBehaviour
 
 	private void Death()
 	{
-		_duration = 0;
+		_durability = 0;
 
 		StartCoroutine(AlphaColor(0.2f, 0.8f));
 	}

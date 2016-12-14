@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 
 [RequireComponent(typeof(Canvas))]
-public class LandMineDurationSlider : MonoBehaviour
+public class LandMineDurabilitySlider : MonoBehaviour
 {
 
 	private Slider _slider;
