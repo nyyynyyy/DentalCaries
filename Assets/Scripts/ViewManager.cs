@@ -4,8 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.EventSystems;
-using System.Collections.Generic;
-
 
 public enum ViewType
 {
@@ -16,6 +14,7 @@ public enum ViewType
 
 public enum MineState
 {
+	None,
     UnSelected,
     JustSet,
     SelectedFullDurability,
@@ -169,7 +168,7 @@ public class ViewManager : MonoBehaviourC {
         inputPos.z = 1f;
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(inputPos);
 
-        Debug.Log(worldPos);
+        //Debug.Log(worldPos);
         Quaternion temp = Quaternion.LookRotation(worldPos);
         _arrow = temp.eulerAngles.y;
 
@@ -258,6 +257,8 @@ public class ViewManager : MonoBehaviourC {
         _background.color = new Color(50 / 255f, 50 / 255f, 50 / 255f, 50f / 255f);
 
         _viewMode = ViewType.MINE;
+
+		SetMineBtn(MineState.None);
     }
     #endregion
 
@@ -265,6 +266,13 @@ public class ViewManager : MonoBehaviourC {
     public void SetMineBtn(MineState state)
     {
         switch (state) {
+			case MineState.None:
+				_mineAdd.SetActive(false);
+				_mineUpgrade.SetActive(false);
+				_mineRemove.SetActive(false);
+				_mineRepair.SetActive(false);
+				_mineUndo.SetActive(false);
+				return;
             case MineState.UnSelected:
                 _mineAdd.SetActive(true);
                 _mineUpgrade.SetActive(false);
@@ -274,7 +282,7 @@ public class ViewManager : MonoBehaviourC {
                 return;
             case MineState.JustSet:
                 _mineAdd.SetActive(false);
-                _mineUpgrade.SetActive(false);
+                _mineUpgrade.SetActive(true);
                 _mineRemove.SetActive(false);
                 _mineRepair.SetActive(false);
                 _mineUndo.SetActive(true);
