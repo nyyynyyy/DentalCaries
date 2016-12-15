@@ -80,7 +80,7 @@ public class TextManager : MonoBehaviour {
 
     public void ViewRound()
     {
-        round.text = _rm.round[_gm.round].name.ToString();
+        round.text = _rm._round[_gm.round].name.ToString();
     }
 
     public void ViewLeftUnit()

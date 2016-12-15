@@ -27,7 +27,7 @@ public struct Round{
 public class RoundManager : MonoBehaviour {
     public static RoundManager instance;
 
-    public Round[] round;
+    public Round[] _round;
 
     private int _roundUnit = 1;
     private int _leftUnit = 0;
@@ -75,7 +75,7 @@ public class RoundManager : MonoBehaviour {
     private IEnumerator WaitAllStart()
     {
         yield return null;
-        StartCoroutine(Round(round[GameManager.instance.round]));
+        StartCoroutine(Round(_round[GameManager.instance.round]));
 
     }
 
@@ -150,13 +150,20 @@ public class RoundManager : MonoBehaviour {
     {
         StartCoroutine(ViewManager.instance.BlurOn());
         yield return StartCoroutine(TextManager.instance.ViewMessage("시련 클리어"));
-        GameManager.instance.TakeMoney(round[GameManager.instance.round].gold);
+        GameManager.instance.TakeMoney(_round[GameManager.instance.round].gold);
         GameManager.instance.RoundClear();
-        ViewManager.instance.OpenShop();
+        if(_round.Length == GameManager.instance.round)
+        {
+            GameManager.instance.ClearGame();
+        }
+        else
+        {
+            ViewManager.instance.OpenShop();
+        }
     }
 
     public void StartNextRound()
     {
-        StartCoroutine(Round(round[GameManager.instance.round]));
+        StartCoroutine(Round(_round[GameManager.instance.round]));
     }
 }

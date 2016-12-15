@@ -103,17 +103,12 @@ public class GameManager : MonoBehaviour {
     {
         _nowHealth -= damage;
         StartCoroutine(PlayerHpBar.instance.BarDecrease());
-        if (_nowHealth <= 0) GameOver();
+        if (_nowHealth <= 0) Gameover(GameOverType.Death);
     }
 
     public bool IsGame()
     {
         return _isGame;
-    }
-
-    public void GameOver()
-    {
-        _isGame = false;
     }
 
     public void RoundClear()
@@ -151,7 +146,15 @@ public class GameManager : MonoBehaviour {
         Gameover(GameOverType.Give);
     }
 
+    public void ClearGame()
+    {
+        ResumeGame();
+        Gameover(GameOverType.Clear);
+    }
+
     private void Gameover(GameOverType result) {
+        _isGame = false;
+
         UserManager.instance.SetUserData(GameKey.OverType, (int)result);
         UserManager.instance.SetUserData(GameKey.Exp, _exp);
         UserManager.instance.SetUserData(GameKey.Time, 65);
