@@ -107,21 +107,6 @@ public class LandMine : MonoBehaviour
 	public int maxDurability { get { return _maxDurability; } }
 	public int durability { get { return _durability; } }
 
-	public MineState mineState
-	{
-		get
-		{
-			if (CanRepair())
-			{
-				return upgradeInfo.HasNext() ? MineState.Selected : MineState.FullUpgrade;
-			}
-			else
-			{
-				return upgradeInfo.HasNext() ? MineState.SelectedFullDurability : MineState.FullUpgradeFullDurability;
-			}
-		}
-	}
-
 	public void Init(LandMineData data)
 	{
 		_attackInfo = new AttackInfo(data.damage, data.delay);

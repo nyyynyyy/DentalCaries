@@ -219,6 +219,8 @@ public class LandMineManager : MonoBehaviourC
 
 		if (Physics.Raycast(ray, out hitInfo, Mathf.Infinity, _fieldLayerMask))
 		{
+			_undoExcutor = null;
+
 			int x = Mathf.FloorToInt((hitInfo.point.x + _gridSize / 2) / _gridSize) + _gridUnit / 2;
 			int z = Mathf.FloorToInt((hitInfo.point.z + _gridSize / 2) / _gridSize) + _gridUnit / 2;
 
@@ -247,37 +249,26 @@ public class LandMineManager : MonoBehaviourC
 		_selectedPoint = point;
 
 		Color selectorColor;
-		MineState state;
 		LandMine selectLandMine;
-		if ((selectLandMine = GetData(point)) != null)
+		if ((selectLandMine = Get(point)) != null)
 		{
 			// landMine Select
-			LandMine.AttackInfo attack = selectLandMine.attackInfo;
-			ViewManager.instance.SetMineState(
-				selectLandMine.upgradeInfo.level,
-				attack.damage, 
-				attack.delay,
-				selectLandMine.maxDurability,
-				selectLandMine.durability
-			);
-
 			selectorColor = Color.blue;
-			state = selectLandMine.mineState;
-		} 
+			UpdateLandMine(selectLandMine);
+		}
 		else if (GameManager.instance.money >= _currentLandMineData.buildCost) 
 		{
 			// grid Select
 			selectorColor = Color.green;
-			state = MineState.UnSelected;
+			ViewManager.instance.SetMineButton(GridState.Grid);
 		} 
 		else 
 		{
 			// no money
 			_selectedPoint = SelectPoint.none;
 			selectorColor = Color.red;
-			state = MineState.None;
+			ViewManager.instance.SetMineButton(GridState.None);
 		}
-		ViewManager.instance.SetMineBtn(state);
 
 		_gridSelector.position = _gridSelectorLoc;
 		selectorColor.a = 0.5f;
@@ -285,12 +276,12 @@ public class LandMineManager : MonoBehaviourC
 		_gridSelector.gameObject.SetActive(true);
 	}
 
-	private LandMine GetData(SelectPoint point)
+	private LandMine Get(SelectPoint point)
 	{
 		return _mountLandMineArray[point.x, point.z];
 	}
 
-	private void SetData(SelectPoint point, LandMine landMine)
+	private void Set(SelectPoint point, LandMine landMine)
 	{
 		_mountLandMineArray[point.x, point.z] = landMine;
 	}
@@ -304,18 +295,20 @@ public class LandMineManager : MonoBehaviourC
 		landMine.transform.localScale = landMine.transform.localScale * _gridSize;
 
 		//RoundManager.instance.
-		SetData(point, landMine);
+		Set(point, landMine);
 
 		_gridSelector.gameObject.SetActive(false);
 
 		UpdateUndoData(new MountUndo(point, _currentLandMineData.buildCost));
+		UpdateLandMine(landMine);
 	}
 
 	private LandMine RemoveMount(SelectPoint point)
 	{ 
-		LandMine removeMount = GetData(point);
-		SetData(point, null);
+		LandMine removeMount = Get(point);
+		Set(point, null);
 		Destroy(removeMount.gameObject);
+		ResetSelector(point);
 
 		return removeMount;
 	}
@@ -331,7 +324,19 @@ public class LandMineManager : MonoBehaviourC
 	private void UpdateUndoData(IUndoExcutor excutor) 
 	{
 		_undoExcutor = excutor;
-		ViewManager.instance.SetMineBtn(MineState.JustSet);
+	}
+
+	private void UpdateLandMine(LandMine landMine) {
+		ViewManager.instance.SetMineButton(landMine.upgradeInfo.HasNext(), landMine.CanRepair(), _undoExcutor != null);
+		LandMine.AttackInfo attack = landMine.attackInfo;
+
+		ViewManager.instance.SetMineState(
+			landMine.upgradeInfo.level,
+			attack.damage,
+			attack.delay,
+			landMine.maxDurability,
+			landMine.durability
+		);
 	}
 
 	#region button
@@ -348,6 +353,7 @@ public class LandMineManager : MonoBehaviourC
 	public void ButtonUndo()
 	{
 		Undo();
+		ResetSelector(_selectedPoint);
 	}
 
 	public void ButtonRemove()
@@ -358,7 +364,6 @@ public class LandMineManager : MonoBehaviourC
 		}
 
 		RemoveMount(_selectedPoint);
-
 		ResetSelector(_selectedPoint);
 	}
 
@@ -376,7 +381,7 @@ public class LandMineManager : MonoBehaviourC
 			return;
 		}
 
-		LandMine landMine = GetData(_selectedPoint);
+		LandMine landMine = Get(_selectedPoint);
 		int cost;
 		if (!landMine.upgradeInfo.HasNext() || !GameManager.instance.SpendMoney(cost = landMine.upgradeInfo.MoveNext().cost))
 		{
@@ -385,6 +390,7 @@ public class LandMineManager : MonoBehaviourC
 
 		landMine.Upgrade();
 		UpdateUndoData(new UpgradeUndo(landMine, cost));
+		ResetSelector(_selectedPoint);
 	}
 
 	public void ButtonRepair() 
@@ -394,7 +400,7 @@ public class LandMineManager : MonoBehaviourC
 			return;
 		}
 
-		LandMine landMine = GetData(_selectedPoint);
+		LandMine landMine = Get(_selectedPoint);
 		int cost = 20;
 		if (!landMine.CanRepair() || !GameManager.instance.SpendMoney(cost)) 
 		{
@@ -402,6 +408,7 @@ public class LandMineManager : MonoBehaviourC
 		}
 
 		landMine.Repair();
+		UpdateLandMine(landMine);
 	}
 	#endregion
 

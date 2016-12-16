@@ -1,4 +1,4 @@
-﻿#define TEST
+﻿#define TESTs
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,15 +12,10 @@ public enum ViewType
     MINE,
 }
 
-public enum MineState
+public enum GridState
 {
 	None,
-    UnSelected,
-    JustSet,
-    SelectedFullDurability,
-    Selected,
-    FullUpgradeFullDurability,
-    FullUpgrade,
+	Grid
 }
 
 public class ViewManager : MonoBehaviourC {
@@ -259,65 +254,28 @@ public class ViewManager : MonoBehaviourC {
 
         _viewMode = ViewType.MINE;
 
-		SetMineBtn(MineState.None);
+		SetMineButton(GridState.None);
     }
     #endregion
 
     #region Mine
-    public void SetMineBtn(MineState state)
-    {
-        switch (state) {
-			case MineState.None:
-				_mineAdd.SetActive(false);
-				_mineUpgrade.SetActive(false);
-				_mineRemove.SetActive(false);
-				_mineRepair.SetActive(false);
-				_mineUndo.SetActive(false);
-				return;
-            case MineState.UnSelected:
-                _mineAdd.SetActive(true);
-                _mineUpgrade.SetActive(false);
-                _mineRemove.SetActive(false);
-                _mineRepair.SetActive(false);
-                _mineUndo.SetActive(false);
-                return;
-            case MineState.JustSet:
-                _mineAdd.SetActive(false);
-                _mineUpgrade.SetActive(true);
-                _mineRemove.SetActive(false);
-                _mineRepair.SetActive(false);
-                _mineUndo.SetActive(true);
-                return;
-            case MineState.SelectedFullDurability:
-                _mineAdd.SetActive(false);
-                _mineUpgrade.SetActive(true);
-                _mineRemove.SetActive(true);
-                _mineRepair.SetActive(false);
-                _mineUndo.SetActive(false);
-                return;
-            case MineState.Selected:
-                _mineAdd.SetActive(false);
-                _mineUpgrade.SetActive(true);
-                _mineRemove.SetActive(true);
-                _mineRepair.SetActive(true);
-                _mineUndo.SetActive(false);
-                return;
-            case MineState.FullUpgrade:
-                _mineAdd.SetActive(false);
-                _mineUpgrade.SetActive(false);
-                _mineRemove.SetActive(true);
-                _mineRepair.SetActive(true);
-                _mineUndo.SetActive(false);
-                return;
-            case MineState.FullUpgradeFullDurability:
-                _mineAdd.SetActive(false);
-                _mineUpgrade.SetActive(false);
-                _mineRemove.SetActive(true);
-                _mineRepair.SetActive(false);
-                _mineUndo.SetActive(false);
-                return;
-        }
-    }
+	public void SetMineButton(bool canUpgrade, bool canRepair, bool isUndo) 
+	{
+		_mineAdd.SetActive(false);
+		_mineRemove.SetActive(!isUndo);
+
+		_mineUpgrade.SetActive(canUpgrade);
+		_mineRepair.SetActive(canRepair);
+		_mineUndo.SetActive(isUndo);
+	}
+
+	public void SetMineButton(GridState gridState) {
+		_mineAdd.SetActive(gridState == GridState.Grid);
+		_mineUpgrade.SetActive(false);
+		_mineRemove.SetActive(false);
+		_mineRepair.SetActive(false);
+		_mineUndo.SetActive(false);
+	}
 
     public void SetMineState(int level, int power, float delay, int maxDurability, int nowDurability)
     {
