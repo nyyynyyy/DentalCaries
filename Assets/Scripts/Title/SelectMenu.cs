@@ -5,16 +5,20 @@ using UnityEngine.UI;
 
 public class SelectMenu : MonoBehaviour {
 
+    [Header("Canvas")]
+    public CanvasGroup _canvas;
+
     [Header("Menu Buttons")]
     public Button[] _btnMenu;
-    public GameObject _areasMenu;
     public GameObject[] _areaMenu;
-    public Image _selectedLine;
 
     public Image _background;
 
     public Color _selectedColor;
     public Color _defaultColor;
+
+    [Header("Side Area")]
+    public GameObject _sideArea;
 
     [Header("Menu 2")]
     public ExpBar _bar;
@@ -24,76 +28,130 @@ public class SelectMenu : MonoBehaviour {
     public Text _textExp;
     public Text _textTicket;
 
-    private float[] _posLine = new float[4] {-800f, -400f, 0, 400f};
-    private float[] _posMenu = new float[4] {0, 1920f, 3840f, 5760f};
-
     private Menu _selectedMenu = Menu.menu1;
 
-    private bool _isMoving = false;
+    private bool _isSelected = false;
 
-    enum Menu
+    public enum Menu
     {
         menu1, menu2, menu3, menu4,
     }
 
     void Start()
     {
-        StartCoroutine("moveMenu", Menu.menu1);
+     //   StartCoroutine("moveMenu", Menu.menu1);
+        _sideArea.SetActive(false);
     }
 
-    private IEnumerator moveMenu(Menu menu)
+    private IEnumerator FadeMenu(Menu menu)
     {
-        _isMoving = true;
+        _canvas.alpha = 0;
 
-        float disLine = (_posLine[(int)menu] - _posLine[(int)_selectedMenu]) / 10f;
-        float disMenu = (_posMenu[(int)menu] - _posMenu[(int)_selectedMenu]) / 10f;
-        float disBack = ((int)menu - (int)_selectedMenu) * 640 / 10f;
-        while (_selectedLine.transform.localPosition.x != _posLine[(int)menu])
+        _areaMenu[(int)menu].SetActive(true);
+
+        while(_canvas.alpha < 1)
         {
-            _selectedLine.transform.localPosition += new Vector3(disLine, 0);
-            _areasMenu.transform.localPosition -= new Vector3(disMenu, 0);
-            _background.transform.localPosition -= new Vector3(disBack, 0);
+            _canvas.alpha += 0.1f;
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        _sideArea.SetActive(true);
+
+        // wait return menu
+        while (_isSelected)
+        {
+            yield return null;
+        }
+        // wait return menu
+
+        _isSelected = true;
+
+        while (_canvas.alpha > 0)
+        {
+            _canvas.alpha -= 0.1f;
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        for (int i = 0; i < _areaMenu.Length; i++)
+        {
+            _areaMenu[i].SetActive(false);
+        }
+
+        _isSelected = false;
+    }
+
+    private IEnumerator MoveButton(Menu menu)
+    {
+        float time = 20f;
+
+        float dis = -_btnMenu[(int)menu].transform.position.x / time;
+
+        for(int i = 0; i < time; i++)
+        {
+            _btnMenu[(int)menu].transform.position += new Vector3(dis, 0);
+            for(int j = 0; j < _btnMenu.Length; j++)
+            {
+                if (j == (int)menu) continue;
+                _btnMenu[j].GetComponent<CanvasGroup>().alpha -= 0.05f;
+            }
             yield return new WaitForSeconds(0.01f);
         }
-        rendMenuText(menu);
-        _selectedMenu = menu;
 
-        _isMoving = false;
+        // wait return menu
+        while (_isSelected)
+        {
+            yield return null;
+        }
+        // wait return menu
+
+
+        for (int i = 0; i < time; i++)
+        {
+            _btnMenu[(int)menu].transform.position -= new Vector3(dis, 0);
+            for (int j = 0; j < _btnMenu.Length; j++)
+            {
+                if (j == (int)menu) continue;
+                _btnMenu[j].GetComponent<CanvasGroup>().alpha += 0.05f;
+            }
+            yield return new WaitForSeconds(0.01f);
+        }
     }
 
-    private void rendMenuText(Menu menu)
+    private void RendMenuText(Menu menu)
     {
         for(int i = 0; i < _btnMenu.Length; i++)
         {
-            _btnMenu[i].GetComponent<Text>().color = (i == (int)menu ? _selectedColor : _defaultColor);
+            Color buttonColor = (i == (int)menu ? _selectedColor : _defaultColor);
+            _btnMenu[i].GetComponent<Text>().color = buttonColor;
         }
     }
 
-	public void viewMenu1()
+    public void ReturnMenu()
     {
-        if (_isMoving) return;
-        StartCoroutine("moveMenu", Menu.menu1);
+        if (!_isSelected) return;
+        _isSelected = false;
+        _sideArea.SetActive(false);
     }
 
-    public void viewMenu2()
+    public void ChangeMenu(int menu)
     {
-        if (_isMoving) return;
-        StartCoroutine("moveMenu", Menu.menu2);
-        _bar.RenderBar();
-    }
+        if (_isSelected) return;
+        _isSelected = true;
 
-    public void viewMenu3()
-    {
-        if (_isMoving) return;
-        StartCoroutine("moveMenu", Menu.menu3);
-        _textLevel.text = "Level\t" + UserManager.instance.GetUserData(UserKey.Level);
-        _textExp.text = "Exp\t" + UserManager.instance.GetUserData(UserKey.Exp);
-        _textTicket.text = "Ticket\t" +UserManager.instance.GetUserData(UserKey.Ticket);
-    }
+        RendMenuText((Menu)menu);
+        StartCoroutine(FadeMenu((Menu)menu));
+        StartCoroutine(MoveButton((Menu)menu));
 
-    public void viewMenu4()
-    {
-        if (_isMoving) return;
-        StartCoroutine("moveMenu", Menu.menu4);
+        switch (menu)
+        {
+            case 2:
+                _bar.RenderBar();
+                return;
+            case 3:
+                _textLevel.text = "Level\t" + UserManager.instance.GetUserData(UserKey.Level);
+                _textExp.text = "Exp\t" + UserManager.instance.GetUserData(UserKey.Exp);
+                _textTicket.text = "Ticket\t" + UserManager.instance.GetUserData(UserKey.Ticket);
+                return;
+        }
     }
 }

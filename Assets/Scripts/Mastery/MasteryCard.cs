@@ -5,24 +5,24 @@ using UnityEngine.UI;
 
 public class MasteryCard : MonoBehaviour {
 
-    private bool _existMastery;
+  //  private bool _existMastery;
 
     public GameObject _masteryCard;
+    public GameObject _emptyCard;
 
-    public Image _cardArt;
-    public Text _cardName;
-    public Text _cardDescription;
-    public Text _cardLevel;
-    public Text _cardRank;
+    public Image _cardArtImage;
+    public Text _cardNameText;
+    public Text _cardDescriptionText;
+    public Text _cardLevelText;
+    public Text _cardRankText;
 
-	void Start ()
+    private MasteryType _cardType;
+    private MasteryRank _cardRank;
+    private MasteryLevel _cardLevel;
+
+	public void TurnCard(bool turn)
     {
-		
-	}
-	
-	// Update is called once per frame
-	void Update ()
-    {
-		
-	}
+        _emptyCard.SetActive(!turn);
+        _masteryCard.SetActive(turn);
+    }
 }
