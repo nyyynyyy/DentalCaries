@@ -1,11 +1,10 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 public class MasteryManager : MonoBehaviour {
-
     public static MasteryManager instance;
-
+    
     public MasteryCard[] _card;
 
     private int[] _cardNumber = new int[3];

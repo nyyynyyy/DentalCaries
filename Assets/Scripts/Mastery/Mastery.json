@@ -1,0 +1,18 @@
+﻿[
+	{
+		"id" : 0,
+		"name" : "empty"
+	},
+	{
+		"id" : 1,
+		"name" : "자린고비",
+		"descript" : "라운드가 끝나고 돈을 사용하지 않으면 다음 라운드 돈 @배",
+		"image" : "tempCard"
+	},
+	{
+		"id" : 2,
+		"name" : "세라",
+		"descript" : "베세나르 세르세르",
+		"image" : "tempCard"
+	}
+]
